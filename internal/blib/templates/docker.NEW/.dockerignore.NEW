@@ -1,0 +1,12 @@
+
+
+.*ignore
+.pylintrc
+bin
+scripts-windows
+hello.py
+Docker*
+docker*
+*.swp
+*.bat
+*.SAVE

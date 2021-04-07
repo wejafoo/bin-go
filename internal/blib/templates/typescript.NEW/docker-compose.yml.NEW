@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  cloud-sql-proxy:
+    image: gcr.io/cloudsql-docker/gce-proxy:latest
+    container_name: cloud_sql_proxy_${LH}
+    environment:
+      - LH=${LH}
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/credentials.json
+      - cloud_sql_instances=
+    command: /cloud_sql_proxy -instances=${cloud_sql_instances}
+    volumes:
+      - ./app/secrets/:/secrets/
+    ports:
+      - 5432:5432

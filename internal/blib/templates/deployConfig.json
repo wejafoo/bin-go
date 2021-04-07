@@ -1,0 +1,13 @@
+{
+	"FdBuildContext":		"ANGULAR",
+	"FdNickname":			"public",
+	"FdServiceName":		"micro-public",
+	"FdTarget":				"local",
+	"FdTargetAlias":		"wes",
+	"FdImageTag":       	"latest",
+	"FdTargetLocalPort":	4421,
+	"FdTargetLogLevel":		"error",
+	"FdCTargetProjectID":	"weja-us",
+	"FdTargetRealm":		"too.fb.",
+	"FdTargetRemotePort":	8080
+}

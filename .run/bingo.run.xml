@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="bingo" type="GoApplicationRunConfiguration" factoryName="Go Application" editBeforeRun="true" singleton="false">
+    <module name="bin-go" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-race" />
+    <kind value="PACKAGE" />
+    <filePath value="bingo.go" />
+    <package value="weja.us/bingo" />
+    <directory value="$PROJECT_DIR$" />
+    <output_directory value="$USER_HOME$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

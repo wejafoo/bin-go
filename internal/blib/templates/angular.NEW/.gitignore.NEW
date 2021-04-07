@@ -1,0 +1,14 @@
+
+
+cloudbuild*
+env
+*.aio
+**/secrets
+.idea
+**/__pycache__
+**/.DS_Store
+*swp
+lib/
+**/*.pyc
+*.NEW
+*.SAVE

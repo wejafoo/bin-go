@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="bingo" type="GoApplicationRunConfiguration" factoryName="Go Application" editBeforeRun="true" singleton="false">
+    <module name="bin-go" />
+    <working_directory value="$PROJECT_DIR$/../bin-go" />
+    <go_parameters value="-i" />
+    <kind value="FILE" />
+    <filePath value="$PROJECT_DIR$/../bin-go/cmd/bingo/bingo.go" />
+    <directory value="$PROJECT_DIR$/../bin-go/cmd/bingo" />
+    <output_directory value="$USER_HOME$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

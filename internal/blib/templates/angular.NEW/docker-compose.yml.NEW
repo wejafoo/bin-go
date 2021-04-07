@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  ros-api:
+    build:
+      context: .
+      args:
+        - LH
+    image: us.gcr.io/rosapi/ros-api-${LH}:latest
+    container_name: ros_api_${LH}
+    restart: unless-stopped
+    environment:
+      - LH=${LH}
+      - DL=${DL}
+      - PORT=${PORT}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/credentials.json
+      - PYTHONUNBUFFERED=1
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+
+  cloud-sql-proxy:
+    image: gcr.io/cloudsql-docker/gce-proxy:latest
+    container_name: cloud_sql_proxy_${LH}
+    environment:
+      - LH=${LH}
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/credentials.json
+      - cloud_sql_instances=vendee-156721:us-central1:vendee=tcp:5432,rosapi:us-central1:ros-db=tcp:5432
+    command: /cloud_sql_proxy -instances=${cloud_sql_instances}
+    volumes:
+      - ./app/secrets/:/secrets/
+    ports:
+      - 5432:5432
