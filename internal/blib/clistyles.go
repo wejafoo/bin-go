@@ -1,5 +1,3 @@
-
-
 package blib
 
 import (
@@ -10,160 +8,185 @@ import (
 )
 
 var (
-	Black  	= color.FgBlack.Render
-	Blue	= color.FgBlue.Render
-	Green  	= color.FgGreen.Render
-	Red  	= color.FgRed.Render
-	Yellow 	= color.FgYellow.Render
-	// Magenta	= color.FgMagenta.Render
-	// Grey		= color.FgDarkGray.Render
-	// Cyan		= color.FgCyan.Render
-	renderColor = Black
+	Black        = color.FgBlack.Render
+	Blue         = color.FgBlue.Render
+	Green        = color.FgGreen.Render
+	Grey         = color.FgDarkGray.Render
+	Red          = color.FgRed.Render
+	Yellow       = color.FgYellow.Render
+	BlackOnGray  = color.Style{color.FgBlack, color.BgGray}.Render
+	WhiteOnRed   = color.Style{color.FgLightWhite, color.BgRed}.Render
+	BlackOnGreen = color.Style{color.FgBlack, color.BgGreen}.Render
+	renderColor  = Black
+	LogWin       = BlackOnGreen(" √ ")
+	LogLose      = WhiteOnRed(" X ")
 )
 
 func ContextHead() bool {
-	success	:= true
-	
-	switch Fd.FdBuildContext {
-		case "ng", "angular":		fmt.Printf( Blue( "\n  ==  ANGULAR DEPLOYMENT START"			))
-		case "ts", "typescript":	fmt.Printf( Blue( "\n  ==  TYPESCRIPT DEPLOYMENT START"			))
-		case "go":					fmt.Printf( Blue( "\n  ==  GO DEPLOYMENT START"					))
-		case "py", "python":		fmt.Printf( Blue( "\n  ==  PYTHON DEPLOYMENT START"				))
-		case "do", "docker":		fmt.Printf( Blue( "\n  ==  DOCKER(GENERIC) DEPLOYMENT START"	))
-		default:					fmt.Printf("I don't understand	:`(" )
-									os.Exit(2)
-	}
 
-	if ! Fd.FdQuiet {
-		fmt.Println()
-		fmt.Printf("%s %s\n", 		pad.Left("Deployment context:",	29," "),Green(Fd.FdBuildContext		))
-		fmt.Printf("\n    %s %s",	pad.Right("Local? ",			25,"."),Green(Fd.FdLocal			))
-		fmt.Printf("\n    %s %s",	pad.Right("Remote? ",			25,"."),Green(Fd.FdRemote			))
-		fmt.Printf("\n    %s %s",	pad.Right("Debug? ",			25,"."),Green(Fd.FdDebug			))
-		fmt.Printf("\n    %s %s",	pad.Right("Quiet? ",			25,"."),Green(Fd.FdQuiet			))
-		fmt.Printf("\n    %s %s\n",	pad.Right("Verbose? ",			25,"."),Green(Fd.FdVerbose			))
-		fmt.Printf("\n    %s %s",	pad.Right("Nickname ",			25,"."),Green(Fd.FdNickname			))
-		fmt.Printf("\n    %s %s",	pad.Right("Service Name ",		25,"."),Green(Fd.FdServiceName		))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Alias ",		25,"."),Green(Fd.FdTargetAlias		))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Domain ",		25,"."),Green(Fd.FdTargetDomain		))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Image Tag ",	25,"."),Green(Fd.FdTargetImageTag	))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Local Port ",	25,"."),Green(Fd.FdTargetLocalPort	))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Log Level ",	25,"."),Green(Fd.FdTargetLogLevel	))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Project ID  ",25,"."),Green(Fd.FdTargetProjectId	))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Realm ",		25,"."),Green(Fd.FdTargetRealm		))
-		fmt.Printf("\n    %s %s",	pad.Right("Target Remote Port ",25,"."),Green(Fd.FdTargetRemotePort	))
-		
-		switch Fdc.FdBuildContext {
-			case "ng", "angular":
-				fmt.Printf( Blue( "\n\n    ==  ANGULAR PIPELINE START		"))
-				color.Style{ color.Yellow, color.OpItalic }.Printf("\t<<<angular.go>>>\n\n"	)
-			case "ts", "typescript":
-				fmt.Printf( Blue( "\n\n    ==  TYPESCRIPT PIPELINE START	"))
-				color.Style{color.Yellow, color.OpItalic}.Printf("\t<<<typescript.go>>>\n\n"	)
-			case "go":
-				fmt.Printf( Blue( "\n\n    ==  GO PIPELINE START			"))
-				color.Style{color.Yellow, color.OpItalic}.Printf("\t<<<go.go>>>\n\n"			)
-			case "py", "python":
-				fmt.Printf( Blue( "\n\n    ==  PYTHON PIPELINE START		"))
-				color.Style{color.Yellow, color.OpItalic}.Printf("\t<<<python.go>>>\n\n"		)
-			case "do", "docker":
-				fmt.Printf( Blue( "\n\n  ==  DOCKER(GENERIC) PIPELINE START	"))
-				color.Style{color.Yellow, color.OpItalic}.Printf("\t<<<docker.go>>>\n\n"		)
-			default:
-				fmt.Printf("%s", Red("I don't understand this build context	:`(")		)
-				os.Exit(2)
-		}
-	}
-	
-	return success
-}
+	// success	:= true
 
-func ContextFoot( Success bool ) bool {
-	renderColor = Red
-	if Success { renderColor = Green }
-	switch Fdc.FdBuildContext {
-		case "ng", "angular":		fmt.Printf(renderColor("\n\n    ==  ANGULAR PIPELINE END			"))
-		case "ts", "typescript":	fmt.Printf(renderColor("\n\n    ==  TYPESCRIPT PIPELINE END			"))
-		case "go":					fmt.Printf(renderColor("\n\n    ==  GO PIPELINE END					"))
-		case "py", "python":		fmt.Printf(renderColor("\n\n    ==  PYTHON PIPELINE END				"))
-		case "do", "docker":		fmt.Printf(renderColor("\n\n    ==  DOCKER(GENERIC) PIPELINE END	"))
-		default:
-			fmt.Printf("\n\n", pad.Left(Red("I don't understand the context :`("),8," "))
-			os.Exit(2 )
-	}
-	color.Style{ color.Yellow, color.OpItalic }.Printf( "<<<Success: %v", Black( Success ))
-	color.Style{ color.Yellow, color.OpItalic }.Printf( ">>>")
-	fmt.Printf("\n    Cleaning up...\n")
-	
-	
-	// Todo: Add pipeline cleanup stuffz
-	
-	
-	fmt.Printf("    done\n")
-	renderColor := Red
-	if Success { renderColor = Green }
-	
-	switch Fdc.FdBuildContext {
-		case "ng", "angular":		fmt.Printf( renderColor("\n  ==  ANGULAR DEPLOYMENT END			"))
-		case "ts", "typescript":	fmt.Printf( renderColor("\n  ==  TYPESCRIPT DEPLOYMENT END		"))
-		case "go":					fmt.Printf( renderColor("\n  ==  GO DEPLOYMENT END				"))
-		case "py", "python":		fmt.Printf( renderColor("\n  ==  PYTHON DEPLOYMENT END			"))
-		case "do", "docker":		fmt.Printf( renderColor("\n  ==  DOCKER(GENERIC) DEPLOYMENT END	"))
+	fmt.Printf(Blue(pad.Right("\n==  Deployment Start", 25, " ")))
+
+	if Fd.FdLocal {
+		switch Fd.FdBuildContext {
+		case "ng", "angular", "ts", "typescript", "go", "py", "python", "do", "docker":
+			fmt.Printf(Yellow(pad.Left("<docker>", 56, " ")))
 		default:
 			fmt.Printf("I don't understand	:`(")
 			os.Exit(2)
+		}
+	} else {
+		switch Fd.FdBuildContext {
+		case "ng", "angular", "ts", "typescript", "go", "py", "python", "do", "docker":
+			fmt.Printf(Yellow(pad.Left("<google>", 56, " ")))
+		default:
+			fmt.Printf("I don't understand	:`(")
+			os.Exit(2)
+		}
 	}
-	
-	color.Style{ color.Yellow, color.OpItalic }.Printf( "<<<Success: %v", Black( Success ))
-	color.Style{ color.Yellow, color.OpItalic }.Printf( ">>>")
-	
-	return Success
+
+	if !Fd.FdQuiet {
+		fmt.Printf("  \n    %s %s", pad.Right("Build? ", 25, "."), Green(Fd.FdBuild))
+		fmt.Printf("  \n    %s %s", pad.Right("Debug? ", 25, "."), Green(Fd.FdDebug))
+		fmt.Printf("  \n    %s %s", pad.Right("Local? ", 25, "."), Green(Fd.FdLocal))
+		fmt.Printf("  \n    %s %s", pad.Right("Quiet? ", 25, "."), Green(Fd.FdQuiet))
+		fmt.Printf("  \n    %s %s", pad.Right("Remote? ", 25, "."), Green(Fd.FdRemote))
+		fmt.Printf("  \n    %s %s", pad.Right("Verbose? ", 25, "."), Green(Fd.FdVerbose))
+		fmt.Printf("\n\n    %s %s", pad.Right("Nickname ", 25, "."), Green(Fd.FdNickname))
+		fmt.Printf("  \n    %s %s", pad.Right("Service Name ", 25, "."), Green(Fd.FdServiceName))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Alias ", 25, "."), Green(Fd.FdTargetAlias))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Domain ", 25, "."), Green(Fd.FdTargetDomain))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Image Tag ", 25, "."), Green(Fd.FdTargetImageTag))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Local Port ", 25, "."), Green(Fd.FdTargetLocalPort))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Log Level ", 25, "."), Green(Fd.FdTargetLogLevel))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Project ID  ", 25, "."), Green(Fd.FdTargetProjectId))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Realm ", 25, "."), Green(Fd.FdTargetRealm))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Remote Port ", 25, "."), Green(Fd.FdTargetRemotePort))
+
+		fmt.Printf(Blue(pad.Right("\n==  Pipeline Start", 25, " ")))
+
+		switch Fdc.FdBuildContext {
+		case "ng", "angular", "ts", "typescript", "go", "py", "python", "do", "docker":
+			fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 56, " ")))
+		default:
+			fmt.Printf("I don't understand	:`(")
+			os.Exit(2)
+		}
+	}
+
+	return true
 }
 
-func DeployHead() {
-	fmt.Printf	( Blue		(pad.Right("\n", 80, "=")))
-	fmt.Printf	( Blue		("\n==  FLEX DEPLOYMENT START" 		))
-	fmt.Printf	( Yellow	("\t\t\t<<<bingo.go>>>"				))
-	fmt.Printf	( Blue		(pad.Right("\n", 80, "=")))
-	fmt.Println	("\n  Compiling FLEX DEPLOY configuration... done." )
+func PipelineFoot(success bool) bool {
+
+	logPrefix := pad.Right("==  Pipeline End ", 77, ".")
+	logInfo := Blue(Fdc.FdBuildContext)
+
+	if success {
+		renderColor = Green
+		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogWin, logInfo)
+	} else {
+		renderColor = Red
+		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogLose, logInfo)
+	}
+
+	// Todo: Add pipeline cleanup stuffz
+
+	return success
 }
 
-func DeployFoot(Success bool) {
-	fmt.Printf("\n  Cleaning up...\n")
-	
-	
+func DeploymentFoot(success bool) bool {
+
+	logPrefix := pad.Right("==  Deployment End ", 77, ".")
+	logInfo := Blue("")
+
+	if Fd.FdLocal {
+		logInfo = Blue("docker")
+	} else {
+		logInfo = Blue("google")
+	}
+	if success {
+		renderColor = Green
+		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogWin, logInfo)
+	} else {
+		renderColor = Red
+		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogLose, logInfo)
+	}
+
+	// Todo: Add pipeline cleanup stuffz
+
+	return success
+}
+
+func FlexHead() {
+
+	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
+	fmt.Printf("\n%s%s", Blue(pad.Right("==  FLEX DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
+	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
+	fmt.Printf("\n%s", pad.Right("Compiling FLEX DEPLOY configuration ", 77, "."))
+}
+
+func FlexFoot(success bool) {
+
+	logPrefix := pad.Right("Cleaning up ", 77, ".")
+	logInfo := Blue("done")
+
 	// Todo: Add deployment cleanup stuff
-	
-	
-	fmt.Printf("  done")
-	renderColor := Red
-	if Success { renderColor = Green }
-	fmt.Printf( renderColor( pad.Right("\n", 80, "=" )))
-	fmt.Printf( renderColor("\n==  FLEX DEPLOYMENT END" ))
-	color.Style{ color.Yellow, color.OpItalic }.Printf("\t\t\t\t<<<Success: %v", Black( Success ))
-	color.Style{ color.Yellow, color.OpItalic }.Printf(">>>")
-	fmt.Printf( renderColor( pad.Right("\n", 80, "=" )))
+
+	fmt.Printf("\n%s%s %s", logPrefix, LogWin, logInfo)
+
+	if success {
+		renderColor = Green
+	} else {
+		renderColor = Red
+	}
+
+	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
+	fmt.Printf(renderColor("\n==  FLEX DEPLOYMENT END"))
+	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
 	fmt.Println()
+
+	logMessage := "*** Success! Visit your handiwork on:"
+	if success {
+		if Fd.FdLocal {
+			fmt.Printf("%s  %s ***\n\n", logMessage, "http://localhost:"+Fd.FdTargetLocalPort+"/"+Fd.FdNickname)
+		} else if Fd.FdTargetAlias == "prod" {
+			fmt.Printf("%s  %s ***\n\n", logMessage, "https://foo.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname)
+		} else {
+			fmt.Printf("%s  %s ***\n\n", logMessage, "https://too.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname)
+		}
+	}
 }
 
-/*  !!!!!!!!!! POTENTIAL SYNCHRONOUS LOGGING APPROACH !!!!!!!!!!
-import ( "bytes" "fmt" "strconv" "sync" )
-func yourfunc( message string, w *sync.WaitGroup ) {
-	defer w.Done()
-	b := &bytes.Buffer{}
-	defer fmt.Print( b )
-	fmt.Fprintf( b, "starting yourfunc with %s\n", message)
-	fmt.Fprintf( b, "message is %s\n", message)
-	fmt.Fprintf( b, "finished yourfunc with %s\n", message)
+func SkipStep(skippedFunc string) {
+
+	logPrefix := Yellow(pad.Right(skippedFunc, 20, " "))
+	logMessage := pad.Right("Pipeline step explicitly skipped ", 57, ".")
+	logInfo := Blue("--build=false")
+
+	fmt.Printf("\n%s%s%s %s", logPrefix, logMessage, LogLose, logInfo)
 }
-func main() {
-	w			:= &sync.WaitGroup{}
-	messages	:= make( []string, 0 )
-	for i := 0; i < 100; i++ { messages = append(messages, strconv.Itoa( i))}
-	for _, m := range messages {
-		w.Add( 1 )
-		go yourfunc(m, w)
+
+// Todo: Consider synchronous logging approach
+/*
+	import ( "bytes" "fmt" "strconv" "sync" )
+	func yourfunc( message string, w *sync.WaitGroup ) {
+		defer w.Done()
+		b := &bytes.Buffer{}
+		defer fmt.Print( b )
+		fmt.Fprintf( b, "starting yourfunc with %s", message)
+		fmt.Fprintf( b, "message is %s", message)
+		fmt.Fprintf( b, "finished yourfunc with %s", message)
 	}
-	w.Wait()
-}
+	func main() {
+		w			:= &sync.WaitGroup{}
+		messages	:= make( []string, 0 )
+		for i := 0; i < 100; i++ { messages = append(messages, strconv.Itoa( i))}
+		for _, m := range messages {
+			w.Add( 1 )
+			go yourfunc(m, w)
+		}
+		w.Wait()
+	}
 */

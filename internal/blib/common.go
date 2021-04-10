@@ -1,20 +1,65 @@
-
-
 package blib
 
+import (
+	"fmt"
+	"github.com/willf/pad"
+	"os"
+)
 
-func BuildLocal()	{
-	println("\n\n\t\t... DOING COMMON LOCAL BUILD STUFFZ ...\n\n")
+func BuildLocal() bool {
+
+	// success 	:= true
+	logPrefix := Yellow(pad.Right("\nBuildLocal():", 20, " "))
+
+	action1 := pad.Right("Check for preexisting port bindings ", 58, ".")
+	action2 := pad.Right("Turn on listener ", 58, ".")
+	action3 := pad.Right("Validate project config file ", 58, ".")
+
+	fmt.Printf("%s%s%s %s", logPrefix, action1, LogWin, Blue(Fd.FdTargetLocalPort))
+	fmt.Printf("%s%s%s %s", logPrefix, action2, LogWin, Blue("STDERR"))
+	fmt.Printf("%s%s%s %s", logPrefix, action3, LogLose, Blue(".fd."+Fd.FdTargetDomain+".json"))
+
+	// Todo: Validate proper json formatting in project configuration file (.fd.*.json)
+
+	return true
 }
 
-func BuildRemote()	{
-	println("\n\n\t\t... DOING COMMON REMOTE BUILD STUFFZ ...\n\n")
+func BuildRemote() bool {
+
+	// success		:= true
+	logPrefix := Yellow(pad.Right("\nBuildRemote():", 20, " "))
+
+	fmt.Printf("%s\t\t... DOING COMMON REMOTE BUILD STUFFZ  ...", logPrefix)
+
+	return true
 }
 
-func DeployLocal()	{
-	println("\n\n\t\t... DOING COMMON LOCAL DEPLOY STUFFZ ...\n\n")
+func DeployLocal() bool {
+
+	// success		:= true
+	logPrefix := Yellow(pad.Right("\nDeployLocal():", 20, " "))
+
+	if Fd.FdVerbose {
+		fmt.Printf(logPrefix)
+	}
+	if Fd.Success = NewDocker(); !Fd.Success {
+		os.Exit(DockerBuildExit())
+	}
+
+	return true
 }
 
-func DeployRemote()	{
-	println("\n\n\t\t... DOING COMMON REMOTE DEPLOY STUFFZ ...\n\n")
+func DeployRemote() bool {
+
+	// success 	:= true
+	logPrefix := Yellow(pad.Right("\nDeployRemote():", 20, " "))
+
+	if Fd.FdTargetRemotePort != "8080" {
+		fmt.Printf("%s%s", logPrefix, "Remote deployments require the remote port to be '8080'. Consider using '-force' to proceed beyond this message.")
+		os.Exit(3)
+	} else {
+		println("\n\n\t\t... DOING COMMON REMOTE DEPLOY STUFFZ ...")
+	}
+
+	return true
 }

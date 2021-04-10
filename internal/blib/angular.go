@@ -1,80 +1,102 @@
-
-
 package blib
 
 import (
-	"context"
+	"bufio"
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
+	"github.com/willf/pad"
+	"log"
+	"os/exec"
+	"strings"
 )
 
-var		angularBuildExit	int
-var		angularDeployExit	int
+var (
+	angularBuildExit int
+	// angularDeployExit	int
+)
 
-
-func	Angular() bool {
-	
+func NewAngular() bool {
+	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
 	ContextHead()
-	angularBuild()
-	
-	return ContextFoot(angularDeploy())
+	if Fd.FdLocal && Fd.FdBuild {
+		BuildLocal()
+		angularBuild()
+	} else if Fd.FdRemote && Fd.FdBuild {
+		BuildRemote()
+		angularBuild()
+	} else {
+		SkipStep("angularBuild():")
+	}
+
+	return DeploymentFoot(PipelineFoot(angularDeploy()))
+}
+
+func angularBuild() bool {
+
+	logPrefix := Yellow(pad.Right("\nangularBuild():", 20, " "))
+	args := "run build:ngssc:" + Fd.FdTargetAlias
+	logMessage := BlackOnGray(" npm " + args + " ")
+	success := false
+	angularBuildExit = 0
+
+	fmt.Printf("%s$ %s", logPrefix, logMessage)
+	if Fd.FdVerbose {
+		fmt.Printf("\n")
+	}
+
+	cmd := exec.Command("npm", strings.Split(args, " ")...)
+	stderr, _ := cmd.StderrPipe()
+	e1 := cmd.Start()
+	if e1 != nil {
+		log.Printf("%s", Red(e1))
+	}
+
+	scanner := bufio.NewScanner(stderr)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		m := scanner.Text()
+		if Fd.FdVerbose {
+			log.Printf("%s", Grey(m))
+		}
+	}
+
+	e2 := cmd.Wait()
+	if e2 != nil {
+		fmt.Printf("%s$ %s%s", logPrefix, pad.Right(logMessage, 69, "."), LogLose)
+		fmt.Printf("\n")
+		log.Fatalf("%s", Red(e2))
+	} else {
+		success = true
+		fmt.Printf("%s$ %s%s", logPrefix, pad.Right(logMessage, 69, "."), LogWin)
+	}
+
+	return success
+}
+
+func angularDeploy() bool {
+
+	success := true
+	// angularDeployExit = 0
+
+	if Fd.FdLocal {
+		success = DeployLocal()
+	} else if Fd.FdRemote {
+		success = DeployRemote()
+	}
+
+	// Todo: Incorporate GoLang native Docker interface in lieu of clunky shell implementation
+	/*
+		ctx				:= context.Background()
+		clientPtr, e	:= client.NewEnvClient()
+		if e != nil { panic( e )}
+		fmt.Printf(" ctx: %T \n %v \n %v", clientPtr, clientPtr, *clientPtr)
+		containers, e := clientPtr.ContainerList(ctx, types.ContainerListOptions{})
+		if e != nil { panic( e )}
+		for _, container := range containers { fmt.Printf("\n Found container ID: %s  %T", container.ID, container.ID)}
+	*/
+
+	return success
 }
 
 func AngularBuildExit() int { return angularBuildExit }
 
-func AngularDeployExit() int { return angularDeployExit }
-
-
-
-
-func angularBuild() bool {
-	success				:=	true
-	angularBuildExit	=	0
-
-	if Fd.FdLocal	{ BuildLocal()	}
-	if Fd.FdRemote	{ BuildRemote()	}
-
-	
-	
-	// Todo: Angular Build Stuffz
-	
-	
-	
-	
-	return success
-}
-
-
-
-
-
-func	angularDeploy() bool {
-	success				:=	true
-	angularDeployExit	=	0
-	
-	if Fd.FdLocal	{ DeployLocal()		}
-	if Fd.FdRemote	{ DeployRemote()	}
-	
-	
-	
-	
-	// Todo: Angular Deploy Stuffz
-	
-	
-	
-	
-	ctx				:= context.Background()
-	clientPtr, e	:= client.NewEnvClient()
-	if e != nil { panic( e )}
-	fmt.Printf(" ctx: %T \n %v \n %v", clientPtr, clientPtr, *clientPtr)
-	
-	containers, e := clientPtr.ContainerList(ctx, types.ContainerListOptions{})
-	if e != nil { panic( e )}
-	
-	fmt.Printf("\n\n")
-	for _, container := range containers { fmt.Printf("\n Found container ID: %s  %T", container.ID, container.ID)}
-	
-	return success
-}
-
+// func AngularDeployExit() int { return angularDeployExit	}
