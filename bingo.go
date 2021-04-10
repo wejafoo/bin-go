@@ -17,7 +17,6 @@ var (
 
 func main() {
 	mockEnv()
-	blib.FlexHead()
 	Fdc = blib.NewInstance(InitFile)
 	Fda = blib.FDA{
 		BuildPtr:            flag.Bool("build", Fdc.FdBuild, "DEFAULT: true - Turns on application-specific builds"),
@@ -64,6 +63,8 @@ func main() {
 	}
 
 	blib.SetConfig(Fd)
+
+	blib.FlexHead()
 
 	if Fd.FdDebug {
 		blib.ShowGlobalDefaults()

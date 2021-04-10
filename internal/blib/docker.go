@@ -52,7 +52,7 @@ func dockerDeploy() bool {
 	return success
 }
 
-func composeBuild() bool { // docker-compose build  --no-cache  --progress auto  --pull "${service_name}"	>>/dev/null 2>&1
+func composeBuild() bool {
 
 	success := false
 	logPrefix := Yellow(pad.Right("\ncomposeBuild():", 20, " "))
@@ -60,8 +60,14 @@ func composeBuild() bool { // docker-compose build  --no-cache  --progress auto 
 	logMessage := BlackOnGray(" docker-compose " + args + " ")
 	logVars := BlackOnGray(" TARGET_LOCAL_PORT=" + Fd.FdTargetLocalPort + " TARGET_PROJECT_ID=" + Fd.FdTargetProjectId + " SERVICE_NAME=" + Fd.FdServiceName + " TARGET_ALIAS=" + Fd.FdTargetAlias + " TARGET_IMAGE_TAG=" + Fd.FdTargetImageTag + " NICKNAME=" + Fd.FdNickname + " ")
 
-	fmt.Printf("%s$ %s", logPrefix, logVars)
-	fmt.Printf("%s$ %s", logPrefix, logMessage)
+	if !Fd.FdQuiet {
+		fmt.Printf("%s$ %s", logPrefix, logVars)
+		fmt.Printf("%s$ %s", logPrefix, logMessage)
+	} else {
+		logMessage := "Building Docker image"
+		fmt.Printf("%s$ %s", logPrefix, logMessage)
+	}
+
 	if Fd.FdVerbose {
 		fmt.Printf("\n")
 	}
@@ -107,7 +113,13 @@ func composeUp() bool {
 	args := "--log-level " + Fd.FdTargetLogLevel + " up --detach --force-recreate " + Fd.FdServiceName
 	logMessage := BlackOnGray(" docker-compose " + args)
 
-	fmt.Printf("%s$ %s", logPrefix, logMessage)
+	if !Fd.FdQuiet {
+		fmt.Printf("%s$ %s", logPrefix, logMessage)
+	} else {
+		logMessage2 := "Spinning up local Docker instance"
+		fmt.Printf("%s%s", logPrefix, logMessage2)
+	}
+
 	if Fd.FdVerbose {
 		fmt.Printf("\n")
 	}

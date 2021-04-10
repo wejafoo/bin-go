@@ -38,7 +38,13 @@ func angularBuild() bool {
 	success := false
 	angularBuildExit = 0
 
-	fmt.Printf("%s$ %s", logPrefix, logMessage)
+	if !Fd.FdQuiet {
+		fmt.Printf("%s$ %s", logPrefix, logMessage)
+	} else {
+		logMessage2 := "Building Angular distribution"
+		fmt.Printf("%s%s", logPrefix, logMessage2)
+	}
+
 	if Fd.FdVerbose {
 		fmt.Printf("\n")
 	}

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gookit/color"
 	"github.com/willf/pad"
-	"os"
 )
 
 var (
@@ -22,28 +21,16 @@ var (
 	LogLose      = WhiteOnRed(" X ")
 )
 
-func ContextHead() bool {
+func ContextHead() {
 
-	// success	:= true
-
-	fmt.Printf(Blue(pad.Right("\n==  Deployment Start", 25, " ")))
+	logPrefix := Blue(pad.Right("\n==  Deployment Start", 25, " "))
+	dockerLogInfo := Yellow(pad.Left("<docker>", 56, " "))
+	googleLogInfo := Yellow(pad.Left("<google>", 56, " "))
 
 	if Fd.FdLocal {
-		switch Fd.FdBuildContext {
-		case "ng", "angular", "ts", "typescript", "go", "py", "python", "do", "docker":
-			fmt.Printf(Yellow(pad.Left("<docker>", 56, " ")))
-		default:
-			fmt.Printf("I don't understand	:`(")
-			os.Exit(2)
-		}
+		fmt.Printf("%s%s", logPrefix, dockerLogInfo)
 	} else {
-		switch Fd.FdBuildContext {
-		case "ng", "angular", "ts", "typescript", "go", "py", "python", "do", "docker":
-			fmt.Printf(Yellow(pad.Left("<google>", 56, " ")))
-		default:
-			fmt.Printf("I don't understand	:`(")
-			os.Exit(2)
-		}
+		fmt.Printf("%s%s", logPrefix, googleLogInfo)
 	}
 
 	if !Fd.FdQuiet {
@@ -63,19 +50,10 @@ func ContextHead() bool {
 		fmt.Printf("  \n    %s %s", pad.Right("Target Project ID  ", 25, "."), Green(Fd.FdTargetProjectId))
 		fmt.Printf("  \n    %s %s", pad.Right("Target Realm ", 25, "."), Green(Fd.FdTargetRealm))
 		fmt.Printf("  \n    %s %s", pad.Right("Target Remote Port ", 25, "."), Green(Fd.FdTargetRemotePort))
-
-		fmt.Printf(Blue(pad.Right("\n==  Pipeline Start", 25, " ")))
-
-		switch Fdc.FdBuildContext {
-		case "ng", "angular", "ts", "typescript", "go", "py", "python", "do", "docker":
-			fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 56, " ")))
-		default:
-			fmt.Printf("I don't understand	:`(")
-			os.Exit(2)
-		}
 	}
 
-	return true
+	fmt.Printf(Blue(pad.Right("\n==  Pipeline Start", 25, " ")))
+	fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 56, " ")))
 }
 
 func PipelineFoot(success bool) bool {
@@ -124,6 +102,15 @@ func FlexHead() {
 	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
 	fmt.Printf("\n%s%s", Blue(pad.Right("==  FLEX DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
 	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
+
+	logInfo := Blue(".fd." + Fd.FdTargetDomain + ".json")
+	fmt.Printf("\n%s", pad.Right("Validating FLEX DEPLOY configuration ", 77, "."))
+	if ConfigIsValid {
+		fmt.Printf("%s %s", LogWin, logInfo)
+	} else {
+		fmt.Printf("%s %s", LogLose, logInfo)
+	}
+
 	fmt.Printf("\n%s", pad.Right("Compiling FLEX DEPLOY configuration ", 77, "."))
 }
 
@@ -150,11 +137,11 @@ func FlexFoot(success bool) {
 	logMessage := "*** Success! Visit your handiwork on:"
 	if success {
 		if Fd.FdLocal {
-			fmt.Printf("%s  %s ***\n\n", logMessage, "http://localhost:"+Fd.FdTargetLocalPort+"/"+Fd.FdNickname)
+			fmt.Printf("%s  %s ***\n\n", logMessage, "http://localhost:"+Fd.FdTargetLocalPort+"/"+Fd.FdNickname+"/")
 		} else if Fd.FdTargetAlias == "prod" {
-			fmt.Printf("%s  %s ***\n\n", logMessage, "https://foo.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname)
+			fmt.Printf("%s  %s ***\n\n", logMessage, "https://foo.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname+"/")
 		} else {
-			fmt.Printf("%s  %s ***\n\n", logMessage, "https://too.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname)
+			fmt.Printf("%s  %s ***\n\n", logMessage, "https://too.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname+"/")
 		}
 	}
 }
@@ -166,6 +153,35 @@ func SkipStep(skippedFunc string) {
 	logInfo := Blue("--build=false")
 
 	fmt.Printf("\n%s%s%s %s", logPrefix, logMessage, LogLose, logInfo)
+}
+
+func ShowGlobalDefaults() {
+	fmt.Printf("\n      %s", pad.Right("", 25, "-"))
+	fmt.Printf("\n    | DIAGNOSTIC INFO:")
+	fmt.Printf("\n    | %s", pad.Right("", 25, "-"))
+	fmt.Printf("\n    | %s %s%s%s", pad.Left("Valid FD init file:", 25, " "), Blue(Pwd), Blue("/"), Blue(InitFile))
+	fmt.Printf("\n    | %s %s%s%s", pad.Left("Valid FD cfg file:", 25, " "), Blue(Pwd), Blue("/"), Blue(fmt.Sprintf(".fd.%s.json", Fdg.FdTargetDomain)))
+	fmt.Printf("\n    | %s", pad.Right("", 25, "-"))
+	fmt.Printf("\n    | %s %s", pad.Right("Build? ", 25, "."), Blue(Fdg.FdBuild))
+	fmt.Printf("\n    | %s %s", pad.Right("Debug? ", 25, "."), Blue(Fdg.FdDebug))
+	fmt.Printf("\n    | %s %s", pad.Right("Local? ", 25, "."), Blue(Fdg.FdLocal))
+	fmt.Printf("\n    | %s %s", pad.Right("Quiet? ", 25, "."), Blue(Fdg.FdQuiet))
+	fmt.Printf("\n    | %s %s", pad.Right("Remote? ", 25, "."), Blue(Fdg.FdRemote))
+	fmt.Printf("\n    | %s %s", pad.Right("Verbose? ", 25, "."), Blue(Fdg.FdVerbose))
+	fmt.Printf("\n    | %s", pad.Right("", 25, "-"))
+	fmt.Printf("\n    | %s %s", pad.Right("Build Context", 25, "."), Blue(Fdg.FdBuildContext))
+	fmt.Printf("\n    | %s %s", pad.Right("Nickname", 25, "."), Blue(Fdg.FdNickname))
+	fmt.Printf("\n    | %s %s", pad.Right("Service Name", 25, "."), Blue(Fdg.FdServiceName))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Alias", 25, "."), Blue(Fdg.FdTargetAlias))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Domain", 25, "."), Blue(Fdg.FdTargetDomain))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Image Tag", 25, "."), Blue(Fdg.FdTargetImageTag))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Local Port", 25, "."), Blue(Fdg.FdTargetLocalPort))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Log Level", 25, "."), Blue(Fdg.FdTargetLogLevel))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Project ID", 25, "."), Blue(Fdg.FdTargetProjectId))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Remote Port", 25, "."), Blue(Fdg.FdTargetRemotePort))
+	fmt.Printf("\n    | %s %s", pad.Right("Target Realm", 25, "."), Blue(Fdg.FdTargetRealm))
+	fmt.Printf("\n      %s", pad.Right("", 25, "_"))
+	fmt.Println()
 }
 
 // Todo: Consider synchronous logging approach

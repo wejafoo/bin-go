@@ -13,13 +13,9 @@ func BuildLocal() bool {
 
 	action1 := pad.Right("Check for preexisting port bindings ", 58, ".")
 	action2 := pad.Right("Turn on listener ", 58, ".")
-	action3 := pad.Right("Validate project config file ", 58, ".")
 
 	fmt.Printf("%s%s%s %s", logPrefix, action1, LogWin, Blue(Fd.FdTargetLocalPort))
 	fmt.Printf("%s%s%s %s", logPrefix, action2, LogWin, Blue("STDERR"))
-	fmt.Printf("%s%s%s %s", logPrefix, action3, LogLose, Blue(".fd."+Fd.FdTargetDomain+".json"))
-
-	// Todo: Validate proper json formatting in project configuration file (.fd.*.json)
 
 	return true
 }
