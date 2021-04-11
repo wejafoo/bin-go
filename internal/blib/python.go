@@ -16,10 +16,11 @@ var (
 
 
 func NewPython() bool {
+	if Fd.FdVerbose { fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext)) }
 
-	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
 	DeploymentHead()
 	PipelineHead()
+
 	if Fd.FdBuild {pythonBuild()}   else   {SkipStep("pythonBuild():")}
 
 	return DeploymentFoot(PipelineFoot(pythonDeploy()))

@@ -18,54 +18,64 @@ var (
 
 
 func NewGcp() bool {
-
 	success := true
-	success = gcpDeploy()
+
+	if Fd.FdLocal {
+		fmt.Printf("UNDER CONSTRUCTION:  Gcp(Kubernetes local deployment")
+	}  else {
+		success = gcpDeploy()
+	}
 
 	return success
 }
 
 
 func gcpDeploy() bool {
+	logPrefix	:= Yellow(pad.Right("\ngcloudDeploy():", 20, " "))
+	gcpCbFile	:= "cloudbuild.json"
+	args		:= "builds submit --config="	+ gcpCbFile				+ " --substitutions" +
+				" _NICKNAME="					+ Fd.FdNickname			+
+				",_SERVICE_NAME="				+ Fd.FdServiceName		+
+				",_TARGET_ALIAS="				+ Fd.FdTargetAlias		+
+				",_TARGET_IMAGE_TAG="			+ Fd.FdTargetImageTag
+	argsSmall	:= "builds submit --config="	+ gcpCbFile
+	success		:= gcloudRun(logPrefix, args, argsSmall)
 
-	success		:= false
-	logPrefix	:= Yellow(pad.Right("\ngcpUp():", 20, " "))
-	args		:= "--log-level " + Fd.FdTargetLogLevel + " up --detach --force-recreate " + Fd.FdServiceName
-	logMessage	:= BlackOnGray(" gcp-gcp " + args)
+	return success
+}
 
-	if !Fd.FdQuiet {
-		fmt.Printf("%s$ %s", logPrefix, logMessage)
-	} else {
-		logMessage2 := "Spinning up local Gcp instance"
-		fmt.Printf("%s%s", logPrefix, logMessage2)
+
+func gcloudRun(logPrefix string, cmdArgs string, cmdArgsSmall string) bool {
+	success 	:= false
+
+	if Fd.FdVerbose {
+		logCommand	:= BlackOnGray(" gcloud " + cmdArgs + " ")
+		fmt.Printf("%s$ %s\n", logPrefix, logCommand)
+		fmt.Printf("\n")
 	}
-	if Fd.FdVerbose { fmt.Printf("\n") }
 
-	cmd := exec.Command("gcp-gcp", strings.Split(args, " ")...)
-	setEnvironment()
-	cmd.Env = os.Environ()
+	command		:= exec.Command("gcloud", strings.Split(cmdArgs, " ")...)
+	command.Env	= os.Environ()
+	stderr, _	:= command.StderrPipe()
+	gcpError	= command.Start()
+	if gcpError != nil { log.Printf("%s", Red(gcpError)) }
 
-	stderr, _ := cmd.StderrPipe()
-	e1 := cmd.Start()
-	if e1 != nil { log.Printf("%s", Red(e1)) }
-
-	scanner := bufio.NewScanner(stderr)
+	scanner			:= bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		stderrText := scanner.Text()
 		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
 	}
-	e2 := cmd.Wait()
 
-	commandSmall := pad.Right(BlackOnGray(" gcp-gcp up (...) "+Fd.FdServiceName+" "), 69, ".")
-	if e2 != nil {
-		fmt.Printf("%s$ %s%s", logPrefix, commandSmall, LogLose)
-		fmt.Printf("\n")
-		log.Fatal(Red(e2))
-	} else {
-		success = true
-		fmt.Printf("%s$ %s%s", logPrefix, commandSmall, LogWin)
+	logCommandSmall := BlackOnGray(pad.Right("gcloud " + cmdArgsSmall,70,"." ))
+
+	gcpError = command.Wait()
+	if gcpError != nil {
+		fmt.Printf("%s$ %s%s", logPrefix, logCommandSmall, LogLose)
+		log.Fatalf("\n%s", Red(gcpError))
 	}
+	success = true
+
 	return success
 }
 

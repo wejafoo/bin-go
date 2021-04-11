@@ -104,22 +104,21 @@ func SkipStep(skippedFunc string) {
 func FlexHead() {
 	fmt.Printf("\n%s%s", Blue(pad.Right("==  FLEX MIFE DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
 	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
-	if ! Fd.FdQuiet {
+	if Fd.FdVerbose {
 		logInfo := Blue(".fd." + Fd.FdTargetDomain + ".json")
 		fmt.Printf("\n%s", pad.Right("Validating MIFE DEPLOYMENT configuration ", 77, "."))
 		if ConfigIsValid {fmt.Printf("%s %s", LogWin, logInfo)}  else  {fmt.Printf("%s %s", LogLose, logInfo)}
+		fmt.Printf("\n%s", pad.Right("Compiling MIFE DEPLOYMENT configuration ", 77, "."))
 	}
-	fmt.Printf("\n%s", pad.Right("Compiling MIFE DEPLOYMENT configuration ", 77, "."))
 }
 
 
 func FlexFoot(success bool) {
-
 	logPrefix	:= pad.Right("Cleaning up ", 77, ".")
 	logInfo		:= Blue("done")
-	// Todo: Add deployment cleanup stuff
-	fmt.Printf("\n%s%s %s", logPrefix, LogWin, logInfo)
 
+	if Fd.FdVerbose { fmt.Printf("\n%s%s %s", logPrefix, LogWin, logInfo) }
+	// Todo: Add deployment cleanup stuff
 	if success {renderColor = Green}  else  {renderColor = Red}
 
 	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
@@ -166,26 +165,3 @@ func ShowGlobalDefaults() {
 	fmt.Printf("\n      %s", pad.Right("", 25, "_"))
 	fmt.Println()
 }
-
-// Todo: Consider synchronous logging approach
-/*
-	import ( "bytes" "fmt" "strconv" "sync" )
-	func yourfunc( message string, w *sync.WaitGroup ) {
-		defer w.Done()
-		b := &bytes.Buffer{}
-		defer fmt.Print( b )
-		fmt.Fprintf( b, "starting yourfunc with %s", message)
-		fmt.Fprintf( b, "message is %s", message)
-		fmt.Fprintf( b, "finished yourfunc with %s", message)
-	}
-	func main() {
-		w			:= &sync.WaitGroup{}
-		messages	:= make( []string, 0 )
-		for i := 0; i < 100; i++ { messages = append(messages, strconv.Itoa( i))}
-		for _, m := range messages {
-			w.Add( 1 )
-			go yourfunc(m, w)
-		}
-		w.Wait()
-	}
-*/

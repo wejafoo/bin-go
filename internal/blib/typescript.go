@@ -18,10 +18,11 @@ var (
 
 
 func NewTypescript() bool {
+	if Fd.FdVerbose { fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext)) }
 
-	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
 	DeploymentHead()
 	PipelineHead()
+
 	if Fd.FdBuild {typescriptBuild()}   else   {SkipStep("typescriptBuild():")}
 
 	return DeploymentFoot(PipelineFoot(typescriptDeploy()))
@@ -56,10 +57,12 @@ func typescriptDeploy() bool {
 func tsNpmRun(prefix string, cmdArgs string) bool {
 
 	success 	:= false
-	logCommand	:= BlackOnGray("tsNpm " + cmdArgs)
 
-	fmt.Printf("%s$  %s", prefix, logCommand)
-	if Fd.FdVerbose { fmt.Printf("\n") }
+	if Fd.FdVerbose {
+		logCommand	:= BlackOnGray(" tsNpm " + cmdArgs)
+		fmt.Printf("%s$  %s", prefix, logCommand)
+		fmt.Printf("\n")
+	}
 
 	command		:= exec.Command("tsNpm", strings.Split(cmdArgs, " ")...)
 	setEnvironment()

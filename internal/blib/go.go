@@ -18,10 +18,11 @@ var (
 
 
 func NewGo() bool {
+	if Fd.FdVerbose { fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext)) }
 
-	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
 	DeploymentHead()
 	PipelineHead()
+
 	if Fd.FdBuild {goBuild()}   else   {SkipStep("goBuild():")}
 
 	return DeploymentFoot(PipelineFoot(goDeploy()))
@@ -60,18 +61,21 @@ func GetGoError() error { return goError }
 func goRun(prefix string, cmdArgs string) bool {
 
 	success 	:= false
-	logCommand	:= BlackOnGray("go " + cmdArgs)
 
-	fmt.Printf("%s$  %s", prefix, logCommand)
-	if Fd.FdVerbose { fmt.Printf("\n") }
+	if Fd.FdVerbose {
+		logCommand	:= BlackOnGray(" go " + cmdArgs)
+		fmt.Printf("%s$ %s", prefix, logCommand)
+		fmt.Printf("\n")
+	}
 
 	command		:= exec.Command("go", strings.Split(cmdArgs, " ")...)
 	setEnvironment()
 	command.Env	= os.Environ()
 
-	stderr, _		:= command.StderrPipe()
-	goError	= command.Start()
+	stderr, _	:= command.StderrPipe()
+	goError		= command.Start()
 	if goError != nil { log.Printf("%s", Red(goError)) }
+
 	scanner			:= bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
