@@ -1,64 +1,89 @@
+
+
 package blib
 
 import (
+	"bufio"
 	"fmt"
+	"github.com/willf/pad"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
 )
 
-var typescriptBuildExit int
+var (
+	tsNpmError error
+)
 
-// var	typescriptDeployExit int
 
 func NewTypescript() bool {
 
 	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
+	DeploymentHead()
+	PipelineHead()
+	if Fd.FdBuild {typescriptBuild()}   else   {SkipStep("typescriptBuild():")}
 
-	ContextHead()
-	typescriptBuild()
-	return PipelineFoot(typescriptDeploy())
+	return DeploymentFoot(PipelineFoot(typescriptDeploy()))
 }
+
 
 func typescriptBuild() bool {
 
-	success := true
-	typescriptBuildExit = 0
-
-	if Fd.FdLocal {
-		success = BuildLocal()
-	} else if Fd.FdRemote {
-		success = BuildRemote()
-	}
-
-	// Todo: Typescript Build Stuffz
+	logPrefix	:= Yellow(pad.Right("\ntypescriptBuild():", 20, " "))
+	args		:= "run build:ngssc:" + Fd.FdTargetAlias
+	success		:= tsNpmRun(logPrefix, args)
 
 	return success
 }
+
 
 func typescriptDeploy() bool {
 
 	success := true
-	// typescriptDeployExit = 0
-
 	if Fd.FdLocal {
-		success = DeployLocal()
-	} else if Fd.FdRemote {
-		success = DeployRemote()
-	}
-
-	// Todo: Typescript Deploy Stuffz
-	/*
-		ctx				:= context.Background()
-		clientPtr, e	:= client.NewEnvClient()
-		if e != nil { panic( e )}
-		fmt.Printf(" ctx: %T \n %v \n %v", clientPtr, clientPtr, *clientPtr)
-		containers, e := clientPtr.ContainerList(ctx, types.ContainerListOptions{})
-		if e != nil { panic( e )}
-		fmt.Printf("\n\n")
-		for _, container := range containers { fmt.Printf("\n Found container ID: %s  %T", container.ID, container.ID)}
-	*/
+		if success = NewDocker(); !success {
+			success		= false
+			tsNpmError	= GetDockerError()
+		}
+	}  else if Fd.FdRemote { success = NewGcp() }
+	// Todo: Incorporate GoLang native Docker interface in lieu of clunky shell implementation
 
 	return success
 }
 
-func TypescriptBuildExit() int { return typescriptBuildExit }
 
-// func TypescriptDeployExit() int { return typescriptDeployExit }
+func tsNpmRun(prefix string, cmdArgs string) bool {
+
+	success 	:= false
+	logCommand	:= BlackOnGray("tsNpm " + cmdArgs)
+
+	fmt.Printf("%s$  %s", prefix, logCommand)
+	if Fd.FdVerbose { fmt.Printf("\n") }
+
+	command		:= exec.Command("tsNpm", strings.Split(cmdArgs, " ")...)
+	setEnvironment()
+	command.Env	= os.Environ()
+
+	stderr, _	:= command.StderrPipe()
+	tsNpmError	= command.Start()
+	if tsNpmError != nil { log.Printf("%s", Red(tsNpmError)) }
+	scanner		:= bufio.NewScanner(stderr)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		stderrText := scanner.Text()
+		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
+	}
+
+	tsNpmError = command.Wait()
+	if tsNpmError != nil {
+		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
+		log.Fatal("%s", Red(tsNpmError))
+	}
+	success = true
+
+	return success
+}
+
+
+func GetTypescriptError() error { return tsNpmError }

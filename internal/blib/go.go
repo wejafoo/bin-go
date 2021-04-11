@@ -1,64 +1,90 @@
+
+
 package blib
 
 import (
+	"bufio"
 	"fmt"
+	"github.com/willf/pad"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
 )
 
-var goBuildExit int
+var (
+	goError error
+)
 
-// var goDeployExit int
 
 func NewGo() bool {
 
 	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
+	DeploymentHead()
+	PipelineHead()
+	if Fd.FdBuild {goBuild()}   else   {SkipStep("goBuild():")}
 
-	ContextHead()
-	goBuild()
-
-	return PipelineFoot(goDeploy())
+	return DeploymentFoot(PipelineFoot(goDeploy()))
 }
 
-func GoBuildExit() int { return goBuildExit }
-
-// func GoDeployExit() int { return goDeployExit }
 
 func goBuild() bool {
-	success := true
-	goBuildExit = 0
-	if Fd.FdLocal {
-		success = BuildLocal()
-	} else if Fd.FdRemote {
-		success = BuildRemote()
-	}
 
-	// Todo: Go Build Stuffz
+	logPrefix	:= Yellow(pad.Right("\ngoBuild():", 20, " "))
+	args		:= "run build:ngssc:" + Fd.FdTargetAlias
+	success		:= goRun(logPrefix, args)
 
 	return success
 }
 
+
 func goDeploy() bool {
 
 	success := true
-	// goDeployExit = 0
-
 	if Fd.FdLocal {
-		success = DeployLocal()
-	} else if Fd.FdRemote {
-		success = DeployRemote()
+		if success = NewDocker(); !success {
+			success	= false
+			goError	= GetDockerError()
+		}
+	}  else if Fd.FdRemote { success = NewGcp() }
+
+	// Todo: Incorporate GoLang native Docker interface in lieu of clunky shell implementation
+
+	return success
+}
+
+
+func GetGoError() error { return goError }
+
+
+func goRun(prefix string, cmdArgs string) bool {
+
+	success 	:= false
+	logCommand	:= BlackOnGray("go " + cmdArgs)
+
+	fmt.Printf("%s$  %s", prefix, logCommand)
+	if Fd.FdVerbose { fmt.Printf("\n") }
+
+	command		:= exec.Command("go", strings.Split(cmdArgs, " ")...)
+	setEnvironment()
+	command.Env	= os.Environ()
+
+	stderr, _		:= command.StderrPipe()
+	goError	= command.Start()
+	if goError != nil { log.Printf("%s", Red(goError)) }
+	scanner			:= bufio.NewScanner(stderr)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		stderrText := scanner.Text()
+		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
 	}
 
-	// Todo: Go Deploy Stuffz
-
-	/*
-		ctx				:= context.Background()
-		clientPtr, e	:= client.NewEnvClient()
-		if e != nil { panic( e )}
-		fmt.Printf(" ctx: %T \n %v \n %v", clientPtr, clientPtr, *clientPtr)
-		containers, e := clientPtr.ContainerList(ctx, types.ContainerListOptions{})
-		if e != nil { panic( e )}
-		fmt.Printf("\n\n")
-		for _, container := range containers { fmt.Printf("\n Found container ID: %s  %T", container.ID, container.ID)}
-	*/
+	goError = command.Wait()
+	if goError != nil {
+		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
+		log.Fatal("%s", Red(goError))
+	}
+	success = true
 
 	return success
 }

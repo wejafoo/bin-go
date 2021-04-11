@@ -1,64 +1,86 @@
 package blib
 
 import (
+	"bufio"
 	"fmt"
+	"github.com/willf/pad"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
 )
 
-var pythonBuildExit int
+var (
+	pythonError error
+)
 
-// var	pythonDeployExit int
 
 func NewPython() bool {
 
 	fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
+	DeploymentHead()
+	PipelineHead()
+	if Fd.FdBuild {pythonBuild()}   else   {SkipStep("pythonBuild():")}
 
-	ContextHead()
-	pythonBuild()
-	return PipelineFoot(pythonDeploy())
+	return DeploymentFoot(PipelineFoot(pythonDeploy()))
 }
+
 
 func pythonBuild() bool {
 
-	success := true
-	pythonBuildExit = 0
-
-	if Fd.FdLocal {
-		success = BuildLocal()
-	} else if Fd.FdRemote {
-		success = BuildRemote()
-	}
-
-	// Todo: Python Build Stuffz
-
+	logPrefix	:= Yellow(pad.Right("\npythonBuild():", 20, " "))
+	args		:= "build" + Fd.FdTargetAlias
+	success		:= pythonRun(logPrefix, args)
+	
 	return success
 }
+
 
 func pythonDeploy() bool {
 
 	success := true
-	// pythonDeployExit = 0
-
 	if Fd.FdLocal {
-		success = DeployLocal()
-	} else if Fd.FdRemote {
-		success = DeployRemote()
-	}
-
-	// Todo: Python Deploy Stuffz
-	/*
-		ctx				:= context.Background()
-		clientPtr, e	:= client.NewEnvClient()
-		if e != nil { panic( e )}
-		fmt.Printf(" ctx: %T \n %v \n %v", clientPtr, clientPtr, *clientPtr)
-		containers, e := clientPtr.ContainerList(ctx, types.ContainerListOptions{})
-		if e != nil { panic( e )}
-		fmt.Printf("\n\n")
-		for _, container := range containers { fmt.Printf("\n Found container ID: %s  %T", container.ID, container.ID)}
-	*/
+		if success = NewDocker(); !success {
+			success		= false
+			pythonError	= GetDockerError()
+		}
+	}  else if Fd.FdRemote { success = NewGcp() }
 
 	return success
 }
 
-func PythonBuildExit() int { return pythonBuildExit }
 
-// func PythonDeployExit() int { return pythonDeployExit }
+func pythonRun(prefix string, cmdArgs string) bool {
+
+	success 	:= false
+	logCommand	:= BlackOnGray("python " + cmdArgs)
+
+	fmt.Printf("%s$  %s", prefix, logCommand)
+	if Fd.FdVerbose { fmt.Printf("\n") }
+
+	command		:= exec.Command("python", strings.Split(cmdArgs, " ")...)
+	setEnvironment()
+	command.Env	= os.Environ()
+
+	stderr, _	:= command.StderrPipe()
+	pythonError	= command.Start()
+	if pythonError != nil { log.Printf("%s", Red(pythonError)) }
+	scanner		:= bufio.NewScanner(stderr)
+	scanner.Split(bufio.ScanLines)
+	for scanner.Scan() {
+		stderrText := scanner.Text()
+		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
+	}
+
+	pythonError = command.Wait()
+	if pythonError != nil {
+		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
+		log.Fatal("%s", Red(pythonError))
+	}
+	success = true
+
+	return success
+}
+
+
+func GetPythonError() error { return pythonError }

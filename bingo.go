@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"weja.us/bingo/internal/blib"
 )
@@ -10,13 +11,16 @@ import (
 const InitFile = ".fd.json"
 
 var (
-	Fd  blib.FDC // final	config	( passed to builders via blib.SetConfig())
-	Fdc blib.FDC // project	config	( from .fd.*.json and ENV vars, serves as defaults for "Fda" )
-	Fda blib.FDA // instance	config	( from CLI args )
+	Fd  blib.FDC 				// final	config	( passed to builders via blib.SetConfig())
+	Fdc blib.FDC 				// project	config	( from .fd.*.json and ENV vars, serves as defaults for "Fda" )
+	Fda blib.FDA 				// instance	config	( from CLI args )
 )
 
+
 func main() {
+
 	mockEnv()
+
 	Fdc = blib.NewInstance(InitFile)
 	Fda = blib.FDA{
 		BuildPtr:            flag.Bool("build", Fdc.FdBuild, "DEFAULT: true - Turns on application-specific builds"),
@@ -37,10 +41,7 @@ func main() {
 		TargetRealmPtr:      flag.String("Target Realm", Fdc.FdTargetRealm, "Prefix that, when prepended to root domain, serves as the app OAuth realm."),
 		TargetRemotePortPtr: flag.String("TargetRemotePort", Fdc.FdTargetRemotePort, "The actual service port of a running container, rarely available to users."),
 	}
-
 	flag.Parse()
-	applyConfigRules()
-
 	Fd = blib.FDC{
 		*Fda.BuildPtr,
 		*Fda.DebugPtr,
@@ -59,48 +60,27 @@ func main() {
 		*Fda.TargetProjectIdPtr,
 		*Fda.TargetRealmPtr,
 		*Fda.TargetRemotePortPtr,
-		true,
+		false,
 	}
-
+	applyConfigRules()
 	blib.SetConfig(Fd)
-
 	blib.FlexHead()
-
-	if Fd.FdDebug {
-		blib.ShowGlobalDefaults()
-	}
-
+	if Fd.FdDebug { blib.ShowGlobalDefaults()}
 	switch Fd.FdBuildContext {
-	case "ng", "angular":
-		if Fd.Success = blib.NewAngular(); !Fd.Success {
-			os.Exit(blib.AngularBuildExit())
-		}
-	case "ts", "typescript":
-		if Fd.Success = blib.NewTypescript(); !Fd.Success {
-			os.Exit(blib.TypescriptBuildExit())
-		}
-	case "go":
-		if Fd.Success = blib.NewGo(); !Fd.Success {
-			os.Exit(blib.GoBuildExit())
-		}
-	case "py", "python":
-		if Fd.Success = blib.NewPython(); !Fd.Success {
-			os.Exit(blib.PythonBuildExit())
-		}
-	case "do", "docker":
-		if Fd.Success = blib.NewDocker(); !Fd.Success {
-			os.Exit(blib.DockerBuildExit())
-		}
-	default:
-		fmt.Printf("%s %s\n\nBuild context: %s was not found... quitting\n\n", blib.LogLose, blib.Red("ALL Bad!"), blib.Red(*Fda.BuildContextPtr))
-		os.Exit(1)
+		case "ng", "angular":		if Fd.Success = blib.NewAngular();		!Fd.Success { log.Fatal(blib.GetAngularError())}
+		case "ts", "typescript":	if Fd.Success = blib.NewTypescript();	!Fd.Success { log.Fatal(blib.GetTypescriptError())}
+		case "go":					if Fd.Success = blib.NewGo();			!Fd.Success { log.Fatal(blib.GetGoError())}
+		case "py", "python":		if Fd.Success = blib.NewPython();		!Fd.Success { log.Fatal(blib.GetPythonError())}
+		case "do", "docker":		if Fd.Success = blib.NewDocker();		!Fd.Success { log.Fatal(blib.GetDockerError())}
+		default:
+			fmt.Printf("%s %s\n\nBuild context: %s was not found... quitting\n\n", blib.LogLose, blib.Red("ALL Bad!"), blib.Red(*Fda.BuildContextPtr))
+			os.Exit(1)
 	}
-
 	blib.FlexFoot(true)
 }
 
-func applyConfigRules() {
 
+func applyConfigRules() {
 	if *Fda.RemotePtr {
 		*Fda.LocalPtr = false
 	} else if !*Fda.LocalPtr {
@@ -108,7 +88,6 @@ func applyConfigRules() {
 		fmt.Printf("\n\n")
 		os.Exit(2)
 	}
-
 	if (*Fda.DebugPtr || *Fda.VerbosePtr) && *Fda.QuietPtr {
 		fmt.Println(blib.Red("\n\nNeither '-debug' nor '-verbose' can be true when '-quiet' is true... quitting"))
 		fmt.Printf("\n\n")
@@ -116,14 +95,15 @@ func applyConfigRules() {
 	}
 }
 
+
 func mockEnv() {
-	// if e := os.Setenv("FD_TARGET_LOG_LEVEL","INFO"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_TARGET_LOCAL_PORT","3000"		); e != nil { fmt.Println("WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_TARGET_PROJECT_ID", "ENV-weja-us"		); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_TARGET_IMAGE_TAG",	"ENV-latest"		); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_SERVICE_NAME",		"ENV-public"		); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_TARGET",			"REMOTE"			); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_TARGET_DOMAIN",	"ENV-weja-us"		); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_TARGET_ALIAS",		"ENV-wes"			); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_BUILD_CONTEXT",	"ENV-ANGULAR"		); e != nil { fmt.Println(	"WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET_LOG_LEVEL",	"INFO"			); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET_LOCAL_PORT","3000"			); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET_PROJECT_ID","ENV-weja-us"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET_IMAGE_TAG",	"ENV-latest"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_SERVICE_NAME",		"ENV-public"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET",			"REMOTE"		); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET_DOMAIN",	"ENV-weja-us"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_TARGET_ALIAS",		"ENV-wes"		); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_BUILD_CONTEXT",	"ENV-ANGULAR"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
 }

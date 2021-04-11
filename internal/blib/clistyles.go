@@ -21,18 +21,16 @@ var (
 	LogLose      = WhiteOnRed(" X ")
 )
 
-func ContextHead() {
 
+func DeploymentHead() {
 	logPrefix := Blue(pad.Right("\n==  Deployment Start", 25, " "))
 	dockerLogInfo := Yellow(pad.Left("<docker>", 56, " "))
 	googleLogInfo := Yellow(pad.Left("<google>", 56, " "))
-
 	if Fd.FdLocal {
 		fmt.Printf("%s%s", logPrefix, dockerLogInfo)
 	} else {
 		fmt.Printf("%s%s", logPrefix, googleLogInfo)
 	}
-
 	if !Fd.FdQuiet {
 		fmt.Printf("  \n    %s %s", pad.Right("Build? ", 25, "."), Green(Fd.FdBuild))
 		fmt.Printf("  \n    %s %s", pad.Right("Debug? ", 25, "."), Green(Fd.FdDebug))
@@ -51,34 +49,12 @@ func ContextHead() {
 		fmt.Printf("  \n    %s %s", pad.Right("Target Realm ", 25, "."), Green(Fd.FdTargetRealm))
 		fmt.Printf("  \n    %s %s", pad.Right("Target Remote Port ", 25, "."), Green(Fd.FdTargetRemotePort))
 	}
-
-	fmt.Printf(Blue(pad.Right("\n==  Pipeline Start", 25, " ")))
-	fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 56, " ")))
 }
 
-func PipelineFoot(success bool) bool {
-
-	logPrefix := pad.Right("==  Pipeline End ", 77, ".")
-	logInfo := Blue(Fdc.FdBuildContext)
-
-	if success {
-		renderColor = Green
-		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogWin, logInfo)
-	} else {
-		renderColor = Red
-		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogLose, logInfo)
-	}
-
-	// Todo: Add pipeline cleanup stuffz
-
-	return success
-}
 
 func DeploymentFoot(success bool) bool {
-
 	logPrefix := pad.Right("==  Deployment End ", 77, ".")
 	logInfo := Blue("")
-
 	if Fd.FdLocal {
 		logInfo = Blue("docker")
 	} else {
@@ -91,69 +67,76 @@ func DeploymentFoot(success bool) bool {
 		renderColor = Red
 		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogLose, logInfo)
 	}
-
 	// Todo: Add pipeline cleanup stuffz
-
 	return success
 }
 
-func FlexHead() {
 
-	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
-	fmt.Printf("\n%s%s", Blue(pad.Right("==  FLEX DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
-	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
-
-	logInfo := Blue(".fd." + Fd.FdTargetDomain + ".json")
-	fmt.Printf("\n%s", pad.Right("Validating FLEX DEPLOY configuration ", 77, "."))
-	if ConfigIsValid {
-		fmt.Printf("%s %s", LogWin, logInfo)
-	} else {
-		fmt.Printf("%s %s", LogLose, logInfo)
-	}
-
-	fmt.Printf("\n%s", pad.Right("Compiling FLEX DEPLOY configuration ", 77, "."))
+func PipelineHead() {
+	fmt.Printf(Blue(pad.Right("\n==  Pipeline Start", 25, " ")))
+	fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 56, " ")))
 }
+
+
+func PipelineFoot(success bool) bool {
+	logPrefix := pad.Right("==  Pipeline End ", 77, ".")
+	logInfo := Blue(Fdc.FdBuildContext)
+	if success {
+		renderColor = Green
+		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogWin, logInfo)
+	} else {
+		renderColor = Red
+		fmt.Printf("\n%s%s %s", renderColor(logPrefix), LogLose, logInfo)
+	}
+	// Todo: Add pipeline cleanup stuffz
+	return success
+}
+
+
+func SkipStep(skippedFunc string) {
+	logPrefix := Yellow(pad.Right(skippedFunc, 20, " "))
+	logMessage := pad.Right("Pipeline step explicitly skipped ", 57, ".")
+	logInfo := Blue("--build=false")
+	fmt.Printf("\n%s%s%s %s", logPrefix, logMessage, LogLose, logInfo)
+}
+
+
+func FlexHead() {
+	fmt.Printf("\n%s%s", Blue(pad.Right("==  FLEX MIFE DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
+	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
+	if ! Fd.FdQuiet {
+		logInfo := Blue(".fd." + Fd.FdTargetDomain + ".json")
+		fmt.Printf("\n%s", pad.Right("Validating MIFE DEPLOYMENT configuration ", 77, "."))
+		if ConfigIsValid {fmt.Printf("%s %s", LogWin, logInfo)}  else  {fmt.Printf("%s %s", LogLose, logInfo)}
+	}
+	fmt.Printf("\n%s", pad.Right("Compiling MIFE DEPLOYMENT configuration ", 77, "."))
+}
+
 
 func FlexFoot(success bool) {
 
-	logPrefix := pad.Right("Cleaning up ", 77, ".")
-	logInfo := Blue("done")
-
+	logPrefix	:= pad.Right("Cleaning up ", 77, ".")
+	logInfo		:= Blue("done")
 	// Todo: Add deployment cleanup stuff
-
 	fmt.Printf("\n%s%s %s", logPrefix, LogWin, logInfo)
 
-	if success {
-		renderColor = Green
-	} else {
-		renderColor = Red
-	}
+	if success {renderColor = Green}  else  {renderColor = Red}
 
 	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
-	fmt.Printf(renderColor("\n==  FLEX DEPLOYMENT END"))
-	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
-	fmt.Println()
+	fmt.Printf(renderColor("\n==  FLEX MIFE DEPLOYMENT END"))
 
-	logMessage := "*** Success! Visit your handiwork on:"
+	logMessage := "*** Success! Visit your handiwork:"
 	if success {
 		if Fd.FdLocal {
-			fmt.Printf("%s  %s ***\n\n", logMessage, "http://localhost:"+Fd.FdTargetLocalPort+"/"+Fd.FdNickname+"/")
+			fmt.Printf("\n%s  %s ***\n\n", logMessage, "http://localhost:"	+ Fd.FdTargetLocalPort	+ "/" + Fd.FdNickname + "/#/home")
 		} else if Fd.FdTargetAlias == "prod" {
-			fmt.Printf("%s  %s ***\n\n", logMessage, "https://foo.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname+"/")
+			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://foo.fb."		+ Fd.FdTargetDomain		+ "/" + Fd.FdNickname + "/#/home")
 		} else {
-			fmt.Printf("%s  %s ***\n\n", logMessage, "https://too.fb."+Fd.FdTargetDomain+"/"+Fd.FdNickname+"/")
+			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://too.fb."		+ Fd.FdTargetDomain		+ "/" + Fd.FdNickname + "/#/home")
 		}
 	}
 }
 
-func SkipStep(skippedFunc string) {
-
-	logPrefix := Yellow(pad.Right(skippedFunc, 20, " "))
-	logMessage := pad.Right("Pipeline step explicitly skipped ", 57, ".")
-	logInfo := Blue("--build=false")
-
-	fmt.Printf("\n%s%s%s %s", logPrefix, logMessage, LogLose, logInfo)
-}
 
 func ShowGlobalDefaults() {
 	fmt.Printf("\n      %s", pad.Right("", 25, "-"))

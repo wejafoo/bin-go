@@ -1,4 +1,4 @@
-package blib
+package templates
 
 /*
 	var	templateBuildExit	int
@@ -6,12 +6,11 @@ package blib
 
 
 	func NewTemplate() bool {
-
 		fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
-
-		ContextHead()
-		templateBuild()
-		return PipelineFoot(templateDeploy())
+		DeploymentHead()
+		PipelineHead()
+		if Fd.FdBuild {templateBuild()}   else   {SkipStep("templateBuild():")}
+		return DeploymentFoot(PipelineFoot(templateDeploy()))
 	}
 
 
