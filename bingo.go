@@ -24,11 +24,11 @@ func main() {
 
 	if Fd.FdDebug { blib.ShowGlobalDefaults()}
 	switch Fd.FdBuildContext {
-		case "ng", "angular":		if Fd.Success = blib.NewAngular();		!Fd.Success { log.Fatal(blib.GetAngularError())}
-		case "ts", "typescript":	if Fd.Success = blib.NewTypescript();	!Fd.Success { log.Fatal(blib.GetTypescriptError())}
-		case "go":					if Fd.Success = blib.NewGo();			!Fd.Success { log.Fatal(blib.GetGoError())}
-		case "py", "python":		if Fd.Success = blib.NewPython();		!Fd.Success { log.Fatal(blib.GetPythonError())}
-		case "do", "docker":		if Fd.Success = blib.NewDocker();		!Fd.Success { log.Fatal(blib.GetDockerError())}
+		case "ng", "angular":		if Fd.Success = blib.NewAngular();		!Fd.Success { log.Fatalf("\n%s", blib.GetAngularError()		)}
+		case "ts", "typescript":	if Fd.Success = blib.NewTypescript();	!Fd.Success { log.Fatalf("\n%s", blib.GetTypescriptError()	)}
+		case "go":					if Fd.Success = blib.NewGo();			!Fd.Success { log.Fatalf("\n%s", blib.GetGoError()			)}
+		case "py", "python":		if Fd.Success = blib.NewPython();		!Fd.Success { log.Fatalf("\n%s", blib.GetPythonError()		)}
+		case "do", "docker":		if Fd.Success = blib.NewDocker();		!Fd.Success { log.Fatalf("\n%s", blib.GetDockerError()		)}
 		default:
 			fmt.Printf("%s %s\n\nBuild context: %s was not found... quitting\n\n", blib.LogLose, blib.Red("ALL Bad!"), blib.Red(*Fda.BuildContextPtr))
 			os.Exit(1)
@@ -63,6 +63,7 @@ func getCleanConfig(Fdc blib.FDC) blib.FDC{
 		BuildContextPtr:     flag.String("context", Fdc.FdBuildContext, "REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy"),
 		NicknamePtr:         flag.String("nickname", Fdc.FdNickname, "Provides the route for mife"),
 		ServiceNamePtr:      flag.String("service", Fdc.FdServiceName, "DEFAULT: $PWD - Working directory and/or Docker Compose service directive."),
+		SiteNicknamePtr:     flag.String("site", Fdc.FdSiteNickname, "Provides the route for mife"),
 		TargetAliasPtr:      flag.String("alias", Fdc.FdTargetAlias, "Recognizable label added to viewable instance name"),
 		TargetDomainPtr:     flag.String("domain", Fdc.FdTargetDomain, "The domain within which the target service will be mapped."),
 		TargetImageTagPtr:   flag.String("image", Fdc.FdTargetImageTag, "The default tag of a newly minted build images."),
@@ -83,6 +84,7 @@ func getCleanConfig(Fdc blib.FDC) blib.FDC{
 		*Fda.BuildContextPtr,
 		*Fda.NicknamePtr,
 		*Fda.ServiceNamePtr,
+		*Fda.SiteNicknamePtr,
 		*Fda.TargetAliasPtr,
 		*Fda.TargetDomainPtr,
 		*Fda.TargetImageTagPtr,

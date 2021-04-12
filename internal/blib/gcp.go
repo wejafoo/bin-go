@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -33,11 +34,14 @@ func NewGcp() bool {
 func gcpDeploy() bool {
 	logPrefix	:= Yellow(pad.Right("\ngcloudDeploy():", 20, " "))
 	gcpCbFile	:= "cloudbuild.json"
-	args		:= "builds submit --config="	+ gcpCbFile				+ " --substitutions" +
-				" _NICKNAME="					+ Fd.FdNickname			+
-				",_SERVICE_NAME="				+ Fd.FdServiceName		+
-				",_TARGET_ALIAS="				+ Fd.FdTargetAlias		+
-				",_TARGET_IMAGE_TAG="			+ Fd.FdTargetImageTag
+	args		:= "builds submit --config=" 	+ gcpCbFile + " --substitutions=" 	+
+						"_DEBUG="				+ strconv.FormatBool(Fd.FdDebug)	+
+						",_LOGS="				+ strconv.FormatBool(Fd.FdVerbose)	+
+						",_NICKNAME="			+ Fd.FdNickname						+
+						",_SERVICE_NAME="		+ Fd.FdServiceName					+
+						",_SITE_NICKNAME="		+ Fd.FdSiteNickname					+
+						",_TARGET_ALIAS="		+ Fd.FdTargetAlias					+
+						",_TARGET_IMAGE_TAG="	+ Fd.FdTargetImageTag
 	argsSmall	:= "builds submit --config="	+ gcpCbFile
 	success		:= gcloudRun(logPrefix, args, argsSmall)
 
@@ -71,7 +75,7 @@ func gcloudRun(logPrefix string, cmdArgs string, cmdArgsSmall string) bool {
 
 	gcpError = command.Wait()
 	if gcpError != nil {
-		fmt.Printf("%s$ %s%s", logPrefix, logCommandSmall, LogLose)
+		fmt.Printf("%s$ %s%s\n ===> ", logPrefix, logCommandSmall, LogLose)
 		log.Fatalf("\n%s", Red(gcpError))
 	}
 	success = true

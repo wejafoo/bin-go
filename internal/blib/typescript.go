@@ -81,7 +81,7 @@ func tsNpmRun(prefix string, cmdArgs string) bool {
 	tsNpmError = command.Wait()
 	if tsNpmError != nil {
 		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
-		log.Fatal("%s", Red(tsNpmError))
+		log.Fatalf("\n%s", Red(tsNpmError))
 	}
 	success = true
 

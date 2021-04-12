@@ -86,7 +86,7 @@ func goRun(prefix string, cmdArgs string) bool {
 	goError = command.Wait()
 	if goError != nil {
 		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
-		log.Fatal("%s", Red(goError))
+		log.Fatalf("\n%s", Red(goError))
 	}
 	success = true
 

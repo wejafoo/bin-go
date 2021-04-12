@@ -16,21 +16,22 @@ var (
 
 
 func NewDocker() bool {
-	success := true
-	success = dockerBuild()
-	success = dockerDeploy()
+	success := dockerBuild()
+
+	if Fd.FdLocal && success { success = dockerDeploy()}
+
 	return success
 }
 
 
 func dockerBuild() bool {
 	success := composePush(composeBuild())
+
 	return success
 }
 
 
 func dockerDeploy() bool {
-
 	success := true
 	if Fd.FdLocal { success = composeUp(composeRemove(composeStop(composePull()))) } else { fmt.Printf("UNDER CONSTRUCTION:  Pure Docker remote deployment ")}
 
@@ -119,7 +120,7 @@ func composeRun(prefix string, cmdArgs string) bool {
 	composeError = command.Wait()
 	if composeError != nil {
 		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
-		log.Fatal("%s", Red(composeError))
+		log.Fatalf("\n%s", Red(composeError))
 	}
 	success = true
 
@@ -131,11 +132,11 @@ func GetDockerError() error { return composeError }
 
 
 func setEnvironment() {
-	
-	if err := os.Setenv("TARGET_LOCAL_PORT",	Fd.FdTargetLocalPort);	err != nil { return }
-	if err := os.Setenv("TARGET_PROJECT_ID",	Fd.FdTargetProjectId);	err != nil { return }
-	if err := os.Setenv("TARGET_ALIAS",		Fd.FdTargetAlias);		err != nil { return }
-	if err := os.Setenv("SERVICE_NAME",		Fd.FdServiceName);		err != nil { return }
-	if err := os.Setenv("TARGET_IMAGE_TAG",	Fd.FdTargetImageTag);	err != nil { return }
-	if err := os.Setenv("NICKNAME",			Fd.FdNickname);			err != nil { return }
+	if err := os.Setenv("TARGET_LOCAL_PORT",	Fd.FdTargetLocalPort	); err != nil { return }
+	if err := os.Setenv("TARGET_PROJECT_ID",	Fd.FdTargetProjectId	); err != nil { return }
+	if err := os.Setenv("TARGET_ALIAS",		Fd.FdTargetAlias		); err != nil { return }
+	if err := os.Setenv("SERVICE_NAME",		Fd.FdServiceName		); err != nil { return }
+	if err := os.Setenv("TARGET_IMAGE_TAG",	Fd.FdTargetImageTag		); err != nil { return }
+	if err := os.Setenv("NICKNAME",			Fd.FdNickname			); err != nil { return }
+	if err := os.Setenv("SITE_NICKNAME",		Fd.FdSiteNickname		); err != nil { return }
 }

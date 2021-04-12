@@ -1,13 +1,16 @@
 {
-	"FdBuildContext":		"ANGULAR",
-	"FdNickname":			"public",
-	"FdServiceName":		"micro-public",
-	"FdTarget":				"local",
-	"FdTargetAlias":		"wes",
-	"FdImageTag":       	"latest",
-	"FdTargetLocalPort":	4421,
-	"FdTargetLogLevel":		"error",
-	"FdCTargetProjectID":	"weja-us",
-	"FdTargetRealm":		"too.fb.",
-	"FdTargetRemotePort":	8080
+	"FdLocal":              false,
+	"FdVerbose":            false,
+	"FdBuildContext":       "angular",
+	"FdNickname":           "private-element",
+	"FdSiteNickname":       "WeJa Too",
+	"FdServiceName":        "micro-private-element",
+	"FdTargetAlias":        "local",
+	"FdTargetDomain":       "weja.us",
+	"FdTargetImageTag":     "latest",
+	"FdTargetLocalPort":    "4421",
+	"FdTargetLogLevel":     "ERROR",
+	"FdTargetProjectId":    "weja-us",
+	"FdTargetRealm":        "too.fb.",
+	"FdTargetRemotePort":   "8080"
 }

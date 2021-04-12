@@ -21,13 +21,29 @@ var (
 )
 
 func NewInstance(file string) FDC {
-	InitFile = file
-	ConfigIsValid = false
-	Pwd, _ = os.Getwd()
-	Fdg = FDC{
-		true, false, false, false, false, false, "ng", "public",
-		"public", "dev", "example.com", "latest", "9999",
-		"info", "default-project", "default.realm.", "8080", true,
+	InitFile		= file
+	ConfigIsValid	= false
+	Pwd, _			= os.Getwd()
+	Fdg = FDC {
+		true,
+		false,
+		false,
+		false,
+		false,
+		false,
+		"ng",
+		"public",
+		"public",
+		"Weja Too",
+		"dev",
+		"example.com",
+		"latest",
+		"9999",
+		"info",
+		"default-project",
+		"default.realm.",
+		"8080",
+		true,
 	}
 
 	Fdc = loadInstance(fmt.Sprintf(".fd.%s.json", initInstance(InitFile).InitTargetDomain))
@@ -41,6 +57,7 @@ func NewInstance(file string) FDC {
 	if Fdc.FdBuildContext		== ""	{ Fdc.FdBuildContext		= Fdg.FdBuildContext		}
 	if Fdc.FdNickname			== ""	{ Fdc.FdNickname			= Fdg.FdNickname			}
 	if Fdc.FdServiceName		== ""	{ Fdc.FdServiceName			= Fdg.FdServiceName			}
+	if Fdc.FdSiteNickname		== ""	{ Fdc.FdSiteNickname		= Fdg.FdSiteNickname		}
 	if Fdc.FdTargetAlias		== ""	{ Fdc.FdTargetAlias			= Fdg.FdTargetAlias			}
 	if Fdc.FdTargetDomain		== ""	{ Fdc.FdTargetDomain		= Fdg.FdTargetDomain		}
 	if Fdc.FdTargetImageTag		== ""	{ Fdc.FdTargetImageTag		= Fdg.FdTargetImageTag		}
@@ -56,6 +73,7 @@ func NewInstance(file string) FDC {
 
 
 func SetConfig(fd FDC) FDC {
+
 	Fd = fd
 
 	return Fd

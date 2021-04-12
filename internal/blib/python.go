@@ -76,7 +76,7 @@ func pythonRun(prefix string, cmdArgs string) bool {
 	pythonError = command.Wait()
 	if pythonError != nil {
 		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
-		log.Fatal("%s", Red(pythonError))
+		log.Fatalf("\n%s", Red(pythonError))
 	}
 	success = true
 
