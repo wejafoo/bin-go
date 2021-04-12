@@ -46,6 +46,30 @@ quasi-intelligent defaults based on the following order of precedence:
 1.  flex deployment runtime configuration file ---- (`<PROJECT ROOT>` / `.fd && <PROJECT ROOT>` / `.fd.<DEPLOYMENT DOMAIN>`)
 1.  intelligent defaults ---- _( global hard-coded rules based on language target / Docker image hard-coded defaults )_
 
+The following itemizes the command line config arguments that can be applied at build time(second column) to the CLI or can 
+be applied via config or ENV variable(third column).  By convention, the third column can be applied to the Env by prepended 
+each camel-cased word boundary with an underscore and switching to all uppercase alphabetic characters 
+(e.g. FdBuildContext = FD_BUILD_CONTEXT)
+
+    Bool    build       FdBuild             -- DEFAULT: true - Turns on application-specific builds"),
+    Bool    debug       FdDebug             -- Turns on detailed logging and enables a debugger if identified"),
+    Bool    local       FdLocal             -- Identifies a build target as local(i.e. not remote)"),
+    Bool    quiet       FdQuiet             -- Turns off all logging to STDOUT "),
+    Bool    remote      FdRemote            -- Identifies a build target as remote(i.e. not local)"),
+    Bool    verbose     FdVerbose           -- Verbose execution output"),
+    String  context     FdBuildContext      -- REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy"),
+    String  nickname    FdNickname          -- Provides the route for mife"),
+    String  service     FdServiceName       -- DEFAULT: $PWD - Working directory and/or Docker Compose service directive."),
+    String  site        FdSiteNickname      -- Provides the route for mife"),
+    String  alias       FdTargetAlias       -- Recognizable label added to viewable instance name"),
+    String  domain      FdTargetDomain      -- The domain within which the target service will be mapped."),
+    String  image       FdTargetImageTag    -- The default tag of a newly minted build images."),
+    String  port        FdTargetLocalPort   -- The host port accessible by a user and mapped to the service port"),
+    String  Log         FdTargetLogLevel    -- DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)"),
+    String  pid         FdTargetProjectId   -- The project ID used for a cloud-based deployments."),
+    String  realm       FdTargetRealm       -- Prefix that, when prepended to root domain, serves as the app OAuth realm."),
+    String  port2       FdTargetRemotePort  -- The actual service port of a running container, rarely available to users."),
+
 
 ----
 
