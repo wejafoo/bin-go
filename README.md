@@ -39,15 +39,21 @@ $   `echo 'export PATH=~/bin:${PATH}' >> ~/.zshrc`
 This utility serves as a simplistic way to build/test/deploy any of the [Supported Environments]() with a single command that uses
 quasi-intelligent defaults based on the following order of precedence:
 
-1.  manual re-deployment of environment variables ---- _( local IDE / remote GCP web UI / local gcloud )_
-1.  runtime environment deployment overrides ---- _( docker-compose.yml / GCP cloudbuild.json )_
-1.  command line argument overrides ---- (`--TARGET_ALIAS=prod`)
-1.  current environment variable overrides ---- (`. ~/.zshrc`/`export TARGET_ALIAS=prod`)
-1.  flex deployment runtime configuration file ---- (`<PROJECT ROOT>` / `.fd && <PROJECT ROOT>` / `.fd.<DEPLOYMENT DOMAIN>`)
-1.  intelligent defaults ---- _( global hard-coded rules based on language target / Docker image hard-coded defaults )_
+1.  manual re-deployment of environment variables -- _( local IDE / remote GCP web UI / local gcloud )_
+1.  runtime environment deployment overrides -- _( docker-compose.yml / GCP cloudbuild.json )_
+1.  command line argument overrides -- (`--TARGET_ALIAS=prod`)
+1.  current environment variable overrides -- (`. ~/.zshrc`/`export TARGET_ALIAS=prod`)
+1.  flex deployment runtime configuration file -- (`<PROJECT ROOT>` / `.fd && <PROJECT ROOT>` / `.fd.<DEPLOYMENT DOMAIN>`)
+1.  intelligent defaults -- _( global hard-coded rules based on language target / Docker image hard-coded defaults )_
 
 The following itemizes the command line config arguments that can be applied at build time(second column) to the CLI or can 
-be applied via config or ENV variable(third column).  By convention, the third column can be applied to the Env by prepended 
+be applied via config or ENV variable using the third column.
+
+**Bools** default to `true` if the flag is added to the command, or using `--build=false` to negate the flag 
+
+**Strings** expect an equal sign followed by double-quoted values.
+
+By convention, the third column can be applied to the Env by prepended 
 each camel-cased word boundary with an underscore and switching to all uppercase alphabetic characters 
 (e.g. FdBuildContext = FD_BUILD_CONTEXT)
 
