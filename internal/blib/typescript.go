@@ -12,9 +12,7 @@ import (
 	"strings"
 )
 
-var (
-	tsNpmError error
-)
+var tsNpmError error
 
 
 func NewTypescript() bool {
@@ -30,38 +28,33 @@ func NewTypescript() bool {
 
 
 func typescriptBuild() bool {
-
 	logPrefix	:= Yellow(pad.Right("\ntypescriptBuild():", 20, " "))
 	args		:= "run build:ngssc:" + Fd.FdTargetAlias
-	success		:= tsNpmRun(logPrefix, args)
+	argsAbbrev	:= args
 
-	return success
+	return tsNpmRun(logPrefix, args, argsAbbrev)
 }
 
 
 func typescriptDeploy() bool {
-
 	success := true
+
 	if Fd.FdLocal {
-		if success = NewDocker(); !success {
-			success		= false
-			tsNpmError	= GetDockerError()
-		}
+		if success = NewDocker(); !success { tsNpmError = GetDockerError() }
 	}  else if Fd.FdRemote { success = NewGcp() }
-	// Todo: Incorporate GoLang native Docker interface in lieu of clunky shell implementation
 
 	return success
 }
 
 
-func tsNpmRun(prefix string, cmdArgs string) bool {
-
-	success 	:= false
-
+func tsNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
-		logCommand	:= BlackOnGray(" tsNpm " + cmdArgs)
-		fmt.Printf("%s$  %s", prefix, logCommand)
+		logCommand	:= BlackOnGray(" tsNpm " + cmdArgs + " ")
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 		fmt.Printf("\n")
+	} else {
+		logCommand	:= "tsNpm " + cmdArgsAbbrev
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 	}
 
 	command		:= exec.Command("tsNpm", strings.Split(cmdArgs, " ")...)
@@ -80,12 +73,11 @@ func tsNpmRun(prefix string, cmdArgs string) bool {
 
 	tsNpmError = command.Wait()
 	if tsNpmError != nil {
-		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
+		log.Printf("%s$  %s%s", logPrefix, command, WhiteOnRed(" X "))
 		log.Fatalf("\n%s", Red(tsNpmError))
 	}
-	success = true
 
-	return success
+	return true
 }
 
 

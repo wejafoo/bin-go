@@ -29,9 +29,11 @@ func NewAngular() bool {
 func angularBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\nangularBuild():", 20, " "))
 	args		:= "run build:ngssc:" + Fd.FdTargetAlias
-	success		:= ngNpmRun(logPrefix, args)
-	
-	return success
+	argsAbbrev	:= args
+
+	return ngNpmRun(logPrefix, args, argsAbbrev)
+	// success		:= ngNpmRun(logPrefix, args, argsAbbrev)
+	// return success
 }
 
 
@@ -49,21 +51,23 @@ func angularDeploy() bool {
 }
 
 
-func ngNpmRun(prefix string, cmdArgs string) bool {
-	success := false
-
+func ngNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
 		logCommand	:= BlackOnGray(" npm " + cmdArgs)
-		fmt.Printf("%s$ %s", prefix, logCommand)
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
+		fmt.Printf("\n")
+	} else {
+		logCommand	:= "npm " + cmdArgsAbbrev
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 		fmt.Printf("\n")
 	}
 
-	command		:= exec.Command("npm", strings.Split(cmdArgs, " ")...)
+	command			:= exec.Command("npm", strings.Split(cmdArgs, " ")...)
 	setEnvironment()
 	command.Env	= os.Environ()
 
-	stderr, _	:= command.StderrPipe()
-	ngNpmError	= command.Start()
+	stderr, _		:= command.StderrPipe()
+	ngNpmError		= command.Start()
 	if ngNpmError != nil { log.Printf("%s", Red(ngNpmError)) }
 
 	scanner		:= bufio.NewScanner(stderr)
@@ -75,12 +79,11 @@ func ngNpmRun(prefix string, cmdArgs string) bool {
 
 	ngNpmError = command.Wait()
 	if ngNpmError != nil {
-		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
-		log.Fatalf("\n%s", Red(ngNpmError))
+		log.Printf("%s$  %s%s", logPrefix, command, WhiteOnRed(" X "))
+		log.Fatalf("%s", Red(ngNpmError))
 	}
-	success = true
 
-	return success
+	return true
 }
 
 

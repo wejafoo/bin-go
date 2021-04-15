@@ -34,53 +34,64 @@ func NewGcp() bool {
 func gcpDeploy() bool {
 	logPrefix	:= Yellow(pad.Right("\ngcloudDeploy():", 20, " "))
 	gcpCbFile	:= "cloudbuild.json"
-	args		:= "builds submit --config=" 	+ gcpCbFile + " --substitutions=" 	+
+	args		:= "builds submit --no-source --config=" + gcpCbFile				+
+						" --substitutions="											+
 						"_DEBUG="				+ strconv.FormatBool(Fd.FdDebug)	+
 						",_LOGS="				+ strconv.FormatBool(Fd.FdVerbose)	+
 						",_NICKNAME="			+ Fd.FdNickname						+
 						",_SERVICE_NAME="		+ Fd.FdServiceName					+
 						",_SITE_NICKNAME="		+ Fd.FdSiteNickname					+
 						",_TARGET_ALIAS="		+ Fd.FdTargetAlias					+
+						",_TARGET_REMOTE_PORT="	+ Fd.FdTargetRemotePort				+
 						",_TARGET_IMAGE_TAG="	+ Fd.FdTargetImageTag
-	argsSmall	:= "builds submit --config="	+ gcpCbFile
-	success		:= gcloudRun(logPrefix, args, argsSmall)
+	argsAbbrev	:= "builds submit (...) --config=" + gcpCbFile + " --substitutions=(...)"
 
-	return success
+	return gcloudRun(logPrefix, args, argsAbbrev)
 }
 
 
-func gcloudRun(logPrefix string, cmdArgs string, cmdArgsSmall string) bool {
-	success 	:= false
-
+func gcloudRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
+	stderrText1	:= ""
+	stderrText2	:= ""
+	stderrText3	:= ""
+	logCommand	:= ""
+	
 	if Fd.FdVerbose {
-		logCommand	:= BlackOnGray(" gcloud " + cmdArgs + " ")
-		fmt.Printf("%s$ %s\n", logPrefix, logCommand)
+		logCommand	= BlackOnGray(" gcloud " + cmdArgs + " ")
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 		fmt.Printf("\n")
+	} else {
+		logCommand	= "gcloud " + cmdArgsAbbrev
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 	}
-
-	command		:= exec.Command("gcloud", strings.Split(cmdArgs, " ")...)
-	command.Env	= os.Environ()
-	stderr, _	:= command.StderrPipe()
-	gcpError	= command.Start()
+	
+	command			:= exec.Command("gcloud", strings.Split(cmdArgs, " ")...)
+	command.Env		= os.Environ()
+	stderr, _		:= command.StderrPipe()
+	gcpError		= command.Start()
 	if gcpError != nil { log.Printf("%s", Red(gcpError)) }
 
 	scanner			:= bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
-		stderrText := scanner.Text()
-		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
+		stderrText1 = scanner.Text()
+		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText1)) }
+		stderrText3 = stderrText2
+		stderrText2 = stderrText1
 	}
-
-	logCommandSmall := BlackOnGray(pad.Right("gcloud " + cmdArgsSmall,70,"." ))
-
+	
 	gcpError = command.Wait()
-	if gcpError != nil {
-		fmt.Printf("%s$ %s%s\n ===> ", logPrefix, logCommandSmall, LogLose)
-		log.Fatalf("\n%s", Red(gcpError))
+	if gcpError != nil  {
+		fmt.Printf("%s$ %s%s\n", logPrefix, logCommand, LogLose)
+		if ! Fd.FdVerbose {
+			log.Printf("%s", stderrText3)
+			log.Printf("%s", stderrText2)
+			log.Printf("%s", stderrText1)
+		}
+		log.Fatalf("%s", Red(gcpError))
 	}
-	success = true
 
-	return success
+	return true
 }
 
 

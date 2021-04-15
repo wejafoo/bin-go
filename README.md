@@ -1,25 +1,27 @@
 # BinGo
+A standardized build and deployment utility built in Go 
+intended to accelerate exploration of your own mifedom.
+
+Supports a small(but growing) list of popular application
+frameworks/languages.
 
 **NOTE:** If go.mod has changed `go mod vendor` should be rerun.
-# bin-zsh
-
-A set of zsh scripts that standardize build and deployment across a growing list of application frameworks and languages.
 
 ----
 
-## Currently Supported Environments
+## Supported Environments
 
 **Build targets:**
 - Angular
 - Docker
-- Python
+- Python <span style="color: red"> (Under construction)
 - Nodejs(Typescript)
 - Go
 
 **Deploy targets:**
-- Local build target runner(in-memory w/ file watcher and hot reload)
-- Docker(Local/Remote)
-- GCP
+- Local runner  (langauage-specific, in-memory file watcher with hot reload)
+- Docker        (Local/Remote)
+- GCP           (Remote only, <span style="color: red"> Local K8s -- Under construction</span>)
 
 ----
 

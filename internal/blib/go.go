@@ -12,10 +12,7 @@ import (
 	"strings"
 )
 
-var (
-	goError error
-)
-
+var goError error
 
 func NewGo() bool {
 	if Fd.FdVerbose { fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext)) }
@@ -30,45 +27,39 @@ func NewGo() bool {
 
 
 func goBuild() bool {
-
 	logPrefix	:= Yellow(pad.Right("\ngoBuild():", 20, " "))
-	args		:= "run build:ngssc:" + Fd.FdTargetAlias
-	success		:= goRun(logPrefix, args)
+	args		:= "build -v -o dist/" + Fd.FdNickname
+	argsAbbrev	:= args
 
-	return success
+	return goRun(logPrefix, args, argsAbbrev)
 }
 
 
 func goDeploy() bool {
-
 	success := true
-	if Fd.FdLocal {
-		if success = NewDocker(); !success {
-			success	= false
-			goError	= GetDockerError()
-		}
-	}  else if Fd.FdRemote { success = NewGcp() }
 
-	// Todo: Incorporate GoLang native Docker interface in lieu of clunky shell implementation
+	if Fd.FdLocal {
+		if success = NewDocker();	!success { goError	= GetDockerError() }
+	}  else if Fd.FdRemote {
+		if success = NewDocker();	!success { ngNpmError = GetDockerError() }
+		if success = NewGcp();		!success { ngNpmError = GetGcpError() }
+	}
 
 	return success
 }
 
 
-func GetGoError() error { return goError }
-
-
-func goRun(prefix string, cmdArgs string) bool {
-
-	success 	:= false
-
+func goRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
-		logCommand	:= BlackOnGray(" go " + cmdArgs)
-		fmt.Printf("%s$ %s", prefix, logCommand)
+		logCommand	:= BlackOnGray(" go " + cmdArgs + " ")
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 		fmt.Printf("\n")
+	} else {
+		logCommand	:= "go " + cmdArgsAbbrev
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
 	}
 
-	command		:= exec.Command("go", strings.Split(cmdArgs, " ")...)
+	command	:= exec.Command("go", strings.Split(cmdArgs, " ")...)
 	setEnvironment()
 	command.Env	= os.Environ()
 
@@ -76,7 +67,7 @@ func goRun(prefix string, cmdArgs string) bool {
 	goError		= command.Start()
 	if goError != nil { log.Printf("%s", Red(goError)) }
 
-	scanner			:= bufio.NewScanner(stderr)
+	scanner		:= bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		stderrText := scanner.Text()
@@ -85,10 +76,12 @@ func goRun(prefix string, cmdArgs string) bool {
 
 	goError = command.Wait()
 	if goError != nil {
-		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
-		log.Fatalf("\n%s", Red(goError))
+		log.Printf("%s$  %s%s", logPrefix, command, WhiteOnRed(" X "))
+		log.Fatalf("%s", Red(goError))
 	}
-	success = true
 
-	return success
+	return true
 }
+
+
+func GetGoError() error { return goError }

@@ -10,9 +10,7 @@ import (
 	"strings"
 )
 
-var (
-	pythonError error
-)
+var pythonError error
 
 
 func NewPython() bool {
@@ -28,18 +26,17 @@ func NewPython() bool {
 
 
 func pythonBuild() bool {
-
 	logPrefix	:= Yellow(pad.Right("\npythonBuild():", 20, " "))
 	args		:= "build" + Fd.FdTargetAlias
-	success		:= pythonRun(logPrefix, args)
-	
-	return success
+	argsAbbrev	:= args
+
+	return pythonRun(logPrefix, args, argsAbbrev)
 }
 
 
 func pythonDeploy() bool {
-
 	success := true
+
 	if Fd.FdLocal {
 		if success = NewDocker(); !success {
 			success		= false
@@ -51,13 +48,15 @@ func pythonDeploy() bool {
 }
 
 
-func pythonRun(prefix string, cmdArgs string) bool {
-
-	success 	:= false
-	logCommand	:= BlackOnGray("python " + cmdArgs)
-
-	fmt.Printf("%s$  %s", prefix, logCommand)
-	if Fd.FdVerbose { fmt.Printf("\n") }
+func pythonRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
+	if Fd.FdVerbose {
+		logCommand	:= BlackOnGray(" python " + cmdArgs + " ")
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
+		fmt.Printf("\n")
+	} else {
+		logCommand	:= "python " + cmdArgsAbbrev
+		fmt.Printf("%s$ %s", logPrefix, logCommand)
+	}
 
 	command		:= exec.Command("python", strings.Split(cmdArgs, " ")...)
 	setEnvironment()
@@ -75,12 +74,11 @@ func pythonRun(prefix string, cmdArgs string) bool {
 
 	pythonError = command.Wait()
 	if pythonError != nil {
-		log.Printf("%s$  %s%s", prefix, command, WhiteOnRed(" X "))
+		log.Printf("%s$  %s%s", logPrefix, command, WhiteOnRed(" X "))
 		log.Fatalf("\n%s", Red(pythonError))
 	}
-	success = true
 
-	return success
+	return true
 }
 
 
