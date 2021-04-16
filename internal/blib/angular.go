@@ -41,9 +41,9 @@ func angularDeploy() bool {
 	success := true
 
 	if Fd.FdLocal {
-		if success = NewDocker();	!success { ngNpmError = GetDockerError() }
+		if success = NewDocker();	!success { ngNpmError = GetComposeError() }
 	}  else if Fd.FdRemote {
-		if success = NewDocker();	!success { ngNpmError = GetDockerError() }
+		if success = NewDocker();	!success { ngNpmError = GetComposeError() }
 		if success = NewGcp();		!success { ngNpmError = GetGcpError() }
 	}
 	// Todo: Investigate Go native Docker in lieu of this clunky OS implementation

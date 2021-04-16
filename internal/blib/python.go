@@ -40,7 +40,7 @@ func pythonDeploy() bool {
 	if Fd.FdLocal {
 		if success = NewDocker(); !success {
 			success		= false
-			pythonError	= GetDockerError()
+			pythonError	= GetComposeError()
 		}
 	}  else if Fd.FdRemote { success = NewGcp() }
 

@@ -39,9 +39,9 @@ func goDeploy() bool {
 	success := true
 
 	if Fd.FdLocal {
-		if success = NewDocker();	!success { goError	= GetDockerError() }
+		if success = NewDocker();	!success { goError	= GetComposeError() }
 	}  else if Fd.FdRemote {
-		if success = NewDocker();	!success { ngNpmError = GetDockerError() }
+		if success = NewDocker();	!success { ngNpmError = GetComposeError() }
 		if success = NewGcp();		!success { ngNpmError = GetGcpError() }
 	}
 

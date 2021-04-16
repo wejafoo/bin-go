@@ -6,6 +6,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"io/ioutil"
 	"os"
+	"regexp"
 )
 
 // Reconciles a config file with any overriding environment variables and
@@ -31,7 +32,9 @@ func NewInstance(file string) FDC {
 		false,
 		false,
 		false,
+		false,
 		"ng",
+		"",
 		"public",
 		"public",
 		"Weja Too",
@@ -49,12 +52,14 @@ func NewInstance(file string) FDC {
 	Fdc = loadInstance(fmt.Sprintf(".fd.%s.json", initInstance(InitFile).InitTargetDomain))
 
 	if !Fdc.FdBuild						{ Fdc.FdBuild				= Fdg.FdBuild				}
+	if !Fdc.FdClean						{ Fdc.FdClean				= Fdg.FdClean				}
 	if !Fdc.FdDebug						{ Fdc.FdDebug				= Fdg.FdDebug				}
 	if !Fdc.FdLocal						{ Fdc.FdLocal				= Fdg.FdLocal				}
 	if !Fdc.FdQuiet						{ Fdc.FdQuiet				= Fdg.FdQuiet				}
 	if !Fdc.FdRemote					{ Fdc.FdRemote				= Fdg.FdRemote				}
 	if !Fdc.FdVerbose					{ Fdc.FdVerbose				= Fdg.FdVerbose				}
 	if Fdc.FdBuildContext		== ""	{ Fdc.FdBuildContext		= Fdg.FdBuildContext		}
+	if Fdc.FdInit				== ""	{ Fdc.FdInit				= Fdg.FdInit				}
 	if Fdc.FdNickname			== ""	{ Fdc.FdNickname			= Fdg.FdNickname			}
 	if Fdc.FdServiceName		== ""	{ Fdc.FdServiceName			= Fdg.FdServiceName			}
 	if Fdc.FdSiteNickname		== ""	{ Fdc.FdSiteNickname		= Fdg.FdSiteNickname		}
@@ -73,7 +78,6 @@ func NewInstance(file string) FDC {
 
 
 func SetConfig(fd FDC) FDC {
-
 	Fd = fd
 
 	return Fd
@@ -81,7 +85,6 @@ func SetConfig(fd FDC) FDC {
 
 
 func initInstance(f string) FDI {
-
 	d, e := ioutil.ReadFile(f)
 	if e != nil {
 		panic(e)
@@ -97,7 +100,6 @@ func initInstance(f string) FDI {
 
 
 func loadInstance(f string) FDC {
-
 	d, e := ioutil.ReadFile(f)
 	// d, e := ioutil.ReadAll(f)
 	if e != nil {
@@ -111,4 +113,41 @@ func loadInstance(f string) FDC {
 	ConfigIsValid = json.Valid([]byte(d))
 
 	return c
+}
+
+func InitConfig (domainName string) {
+	if matched, _ := regexp.MatchString("^[0-9a-zA-Z]+(.[0-9a-zA-Z]+)*$", domainName); matched {
+		fmt.Println("Valid domain")
+	} else {
+		fmt.Println("Booooooo! Aaah c'mon, you at least need to provide a valid domain name!!")
+		os.Exit(3)
+	}
+
+	currentFile	:= ".fd." + Fd.FdTargetDomain	+ ".json"
+	newFile		:= ".fd." + domainName			+ ".json"
+
+	if _, err := os.Stat(InitFile); os.IsNotExist(err) {
+		fmt.Println("Okay, looks like this project is all new to BinGo... welcome! ", newFile, " using presets from: ", currentFile )
+		fmt.Printf("\nSetting your default working domain in: %s", "test.fd.json")
+
+		defaultWorkingDomain := "{\"InitTargetDomain\": \"test.fd.json\"}"
+
+		fmt.Printf("\nAdding the following JSON representation: %s", defaultWorkingDomain)
+
+		fmt.Printf("Cool, an existing project to work with.", newFile)
+
+		if _, err := os.Stat(newFile); os.IsNotExist(err) {
+			fmt.Println("Got it, looks good to add to your new configuration: ", newFile, " using presets from: ", currentFile )
+		} else {
+			fmt.Printf("Hmm, looks like this domain is already init'd: Could %s be unintended?", newFile)
+		}
+	} else {
+		fmt.Printf("\nHmm, I see we have an existing project to work with... nice.")
+		if _, err := os.Stat(newFile); os.IsNotExist(err) {
+			fmt.Println("\nRockin' a new configuration init file: ", newFile, " using presets from: ", currentFile )
+		} else {
+			fmt.Printf("\nHmm, looks like this domain is already init'd: %s  Unintended???", newFile)
+		}
+	}
+
 }

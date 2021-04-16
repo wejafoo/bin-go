@@ -32,10 +32,11 @@ func DeploymentHead() {
 		fmt.Printf("%s%s", logPrefix, googleLogInfo)
 	}
 	if !Fd.FdQuiet {
-		fmt.Printf("  \n    %s %s", pad.Right("Build? ",				25, "."), Green(Fd.FdBuild))
-		fmt.Printf("  \n    %s %s", pad.Right("Debug? ",				25, "."), Green(Fd.FdDebug))
-		fmt.Printf("  \n    %s %s", pad.Right("Local? ",				25, "."), Green(Fd.FdLocal))
-		fmt.Printf("  \n    %s %s", pad.Right("Quiet? ",				25, "."), Green(Fd.FdQuiet))
+		fmt.Printf("  \n    %s %s", pad.Right("Build? ",					25, "."), Green(Fd.FdBuild))
+		fmt.Printf("  \n    %s %s", pad.Right("Clean? ",					25, "."), Green(Fd.FdClean))
+		fmt.Printf("  \n    %s %s", pad.Right("Debug? ",					25, "."), Green(Fd.FdDebug))
+		fmt.Printf("  \n    %s %s", pad.Right("Local? ",					25, "."), Green(Fd.FdLocal))
+		fmt.Printf("  \n    %s %s", pad.Right("Quiet? ",					25, "."), Green(Fd.FdQuiet))
 		fmt.Printf("  \n    %s %s", pad.Right("Remote? ",				25, "."), Green(Fd.FdRemote))
 		fmt.Printf("  \n    %s %s", pad.Right("Verbose? ",				25, "."), Green(Fd.FdVerbose))
 		fmt.Printf("\n\n    %s %s", pad.Right("Nickname ",				25, "."), Green(Fd.FdNickname))
@@ -46,9 +47,12 @@ func DeploymentHead() {
 		fmt.Printf("  \n    %s %s", pad.Right("Target Image Tag ",		25, "."), Green(Fd.FdTargetImageTag))
 		fmt.Printf("  \n    %s %s", pad.Right("Target Local Port ",		25, "."), Green(Fd.FdTargetLocalPort))
 		fmt.Printf("  \n    %s %s", pad.Right("Target Log Level ",		25, "."), Green(Fd.FdTargetLogLevel))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Project ID  ",	25, "."), Green(Fd.FdTargetProjectId))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Project ID  ",		25, "."), Green(Fd.FdTargetProjectId))
 		fmt.Printf("  \n    %s %s", pad.Right("Target Realm ",			25, "."), Green(Fd.FdTargetRealm))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Remote Port ",	25, "."), Green(Fd.FdTargetRemotePort))
+		fmt.Printf("  \n    %s %s", pad.Right("Target Remote Port ",		25, "."), Green(Fd.FdTargetRemotePort))
+		if Fd.FdInit != "" {
+			fmt.Printf("\n\n %s %s", pad.Right("Init ",					25, "."), Green(Fd.FdInit))
+		}
 	}
 }
 
@@ -103,7 +107,7 @@ func SkipStep(skippedFunc string) {
 
 
 func FlexHead() {
-	fmt.Printf("\n%s%s", Blue(pad.Right("==  FLEX MIFE DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
+	fmt.Printf("\n%s%s", Blue(pad.Right("==  MIFE FLEX DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
 	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
 	if Fd.FdVerbose {
 		logInfo := Blue(".fd." + Fd.FdTargetDomain + ".json")
@@ -139,20 +143,22 @@ func FlexFoot(success bool) {
 
 
 func ShowGlobalDefaults() {
-	fmt.Printf("\n     %s", pad.Right("",							25, "_"))
+	fmt.Printf("\n     %s", pad.Right("",							26, "_"))
 	fmt.Printf("\n    | DIAGNOSTIC INFO:")
-	fmt.Printf("\n    |%s", pad.Right("",							25, "-"))
+	fmt.Printf("\n    |%s", pad.Right("",							26, "-"))
 	fmt.Printf("\n    | %s %s%s%s", pad.Left("Valid FD init file:",	25, " "), Blue(Pwd), Blue("/"), Blue(InitFile))
 	fmt.Printf("\n    | %s %s%s%s", pad.Left("Valid FD cfg file:",	25, " "), Blue(Pwd), Blue("/"), Blue(fmt.Sprintf(".fd.%s.json", Fdg.FdTargetDomain)))
-	fmt.Printf("\n    |%s", pad.Right("",							25, "-"))
-	fmt.Printf("\n    | %s %s", pad.Right("Build? ",				25, "."), Blue(Fdg.FdBuild))
-	fmt.Printf("\n    | %s %s", pad.Right("Debug? ",				25, "."), Blue(Fdg.FdDebug))
-	fmt.Printf("\n    | %s %s", pad.Right("Local? ",				25, "."), Blue(Fdg.FdLocal))
-	fmt.Printf("\n    | %s %s", pad.Right("Quiet? ",				25, "."), Blue(Fdg.FdQuiet))
+	fmt.Printf("\n    |%s", pad.Right("",							26, "-"))
+	fmt.Printf("\n    | %s %s", pad.Right("Build? ",					25, "."), Blue(Fdg.FdBuild))
+	fmt.Printf("\n    | %s %s", pad.Right("Clean? ",					25, "."), Blue(Fdg.FdClean))
+	fmt.Printf("\n    | %s %s", pad.Right("Debug? ",					25, "."), Blue(Fdg.FdDebug))
+	fmt.Printf("\n    | %s %s", pad.Right("Local? ",					25, "."), Blue(Fdg.FdLocal))
+	fmt.Printf("\n    | %s %s", pad.Right("Quiet? ",					25, "."), Blue(Fdg.FdQuiet))
 	fmt.Printf("\n    | %s %s", pad.Right("Remote? ",				25, "."), Blue(Fdg.FdRemote))
 	fmt.Printf("\n    | %s %s", pad.Right("Verbose? ",				25, "."), Blue(Fdg.FdVerbose))
-	fmt.Printf("\n    |%s", pad.Right("",							25, "-"))
+	fmt.Printf("\n    |%s", pad.Right("",							26, "-"))
 	fmt.Printf("\n    | %s %s", pad.Right("Build Context",			25, "."), Blue(Fdg.FdBuildContext))
+	fmt.Printf("\n    | %s %s", pad.Right("Init",					25, "."), Blue(Fdg.FdInit))
 	fmt.Printf("\n    | %s %s", pad.Right("Nickname",				25, "."), Blue(Fdg.FdNickname))
 	fmt.Printf("\n    | %s %s", pad.Right("Service Name",			25, "."), Blue(Fdg.FdServiceName))
 	fmt.Printf("\n    | %s %s", pad.Right("Site Nickname",			25, "."), Blue(Fdg.FdSiteNickname))
@@ -164,6 +170,6 @@ func ShowGlobalDefaults() {
 	fmt.Printf("\n    | %s %s", pad.Right("Target Project ID",		25, "."), Blue(Fdg.FdTargetProjectId))
 	fmt.Printf("\n    | %s %s", pad.Right("Target Remote Port",		25, "."), Blue(Fdg.FdTargetRemotePort))
 	fmt.Printf("\n    | %s %s", pad.Right("Target Realm",			25, "."), Blue(Fdg.FdTargetRealm))
-	fmt.Printf("\n     %s", pad.Right("",							25, "-"))
+	fmt.Printf("\n    +%s", pad.Right("",							25, "-"))
 	fmt.Println()
 }

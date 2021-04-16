@@ -40,7 +40,7 @@ func typescriptDeploy() bool {
 	success := true
 
 	if Fd.FdLocal {
-		if success = NewDocker(); !success { tsNpmError = GetDockerError() }
+		if success = NewDocker(); !success { tsNpmError = GetComposeError() }
 	}  else if Fd.FdRemote { success = NewGcp() }
 
 	return success
