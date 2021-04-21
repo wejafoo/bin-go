@@ -37,6 +37,7 @@ func gcpDeploy() bool {
 	args		:= "builds submit --no-source --config=" + gcpCbFile				+
 						" --substitutions="											+
 						"_DEBUG="				+ strconv.FormatBool(Fd.FdDebug)	+
+// 						",_TEST="				+ strconv.FormatBool(Fd.FdTest)		+  // not yet implemented for remote deploys
 						",_LOGS="				+ strconv.FormatBool(Fd.FdVerbose)	+
 						",_NICKNAME="			+ Fd.FdNickname						+
 						",_SERVICE_NAME="		+ Fd.FdServiceName					+

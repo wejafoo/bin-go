@@ -26,27 +26,27 @@ func NewInstance(file string) FDC {
 	ConfigIsValid	= false
 	Pwd, _			= os.Getwd()
 	Fdg = FDC {
-		true,
-		false,
-		false,
-		false,
-		false,
-		false,
-		false,
-		"ng",
-		"",
-		"public",
-		"public",
-		"Weja Too",
-		"dev",
-		"example.com",
-		"latest",
-		"9999",
-		"info",
-		"default-project",
-		"default.realm.",
-		"8080",
-		true,
+		FdBuild: true,
+		FdClean: false,
+		FdDebug: false,
+		FdLocal: false,
+		FdQuiet: false,
+		FdRemote: false,
+		FdTest: false,
+		FdVerbose: false,
+		FdBuildContext: "ng",
+		FdInit: "",
+		FdNickname: "public",
+		FdServiceName: "public",
+		FdSiteNickname: "Weja Too",
+		FdTargetAlias: "dev",
+		FdTargetDomain: "example.com",
+		FdTargetImageTag: "latest",
+		FdTargetLocalPort: "9999",
+		FdTargetLogLevel: "info",
+		FdTargetProjectId: "default-project",
+		FdTargetRealm: "default.realm.",
+		FdTargetRemotePort: "8080",
 	}
 
 	Fdc = loadInstance(fmt.Sprintf(".fd.%s.json", initInstance(InitFile).InitTargetDomain))
@@ -57,6 +57,7 @@ func NewInstance(file string) FDC {
 	if !Fdc.FdLocal						{ Fdc.FdLocal				= Fdg.FdLocal				}
 	if !Fdc.FdQuiet						{ Fdc.FdQuiet				= Fdg.FdQuiet				}
 	if !Fdc.FdRemote					{ Fdc.FdRemote				= Fdg.FdRemote				}
+	if !Fdc.FdTest						{ Fdc.FdTest				= Fdg.FdTest				}
 	if !Fdc.FdVerbose					{ Fdc.FdVerbose				= Fdg.FdVerbose				}
 	if Fdc.FdBuildContext		== ""	{ Fdc.FdBuildContext		= Fdg.FdBuildContext		}
 	if Fdc.FdInit				== ""	{ Fdc.FdInit				= Fdg.FdInit				}
@@ -114,6 +115,10 @@ func loadInstance(f string) FDC {
 
 	return c
 }
+
+// Todo:  Add "--init <DOMAIN_NAME>" argument that passes the full complement of configurations/templates
+//  		to an existing non-bingo project (e.g .fd.json, .fd.<DOMAIN_NAME>.json, Dockerfile, docker-compose.yml,
+//  			cloudbuild.json, docker-entrypoint.sh, .env.local.yml
 
 func InitConfig (domainName string) {
 	if matched, _ := regexp.MatchString("^[0-9a-zA-Z]+(.[0-9a-zA-Z]+)*$", domainName); matched {

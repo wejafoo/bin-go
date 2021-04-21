@@ -1,7 +1,7 @@
 
 # Go specific
-pkg
-vendor
+pkg/**
+vendor/**
 
 .ARCHIVE
 *.NEW

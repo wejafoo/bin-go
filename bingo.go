@@ -10,18 +10,13 @@ import (
 
 const InitFile = ".fd.json"
 
-var (
-	Fda blib.FDA
-)
+var Fda blib.FDA
 
 
 func main() {
-	Fd := blib.SetConfig(getCleanConfig(blib.NewInstance(InitFile)))
+	mockEnv()
 
-	if Fd.FdDebug {
-		mockEnv()
-		Fd = blib.SetConfig(getCleanConfig(blib.NewInstance(InitFile)))
-	}
+	Fd := blib.SetConfig(getCleanConfig(blib.NewInstance(InitFile)))
 
 	blib.FlexHead()
 
@@ -32,11 +27,11 @@ func main() {
 		blib.InitConfig(Fd.FdInit)
 	} else {
 		switch Fd.FdBuildContext {
-		case "ng", "angular":		if Fd.Success = blib.NewAngular();		!Fd.Success { log.Fatalf("\n%s", blib.GetAngularError()		)}
-		case "ts", "typescript":	if Fd.Success = blib.NewTypescript();	!Fd.Success { log.Fatalf("\n%s", blib.GetTypescriptError()	)}
-		case "go":					if Fd.Success = blib.NewGo();			!Fd.Success { log.Fatalf("\n%s", blib.GetGoError()			)}
-		case "py", "python":		if Fd.Success = blib.NewPython();		!Fd.Success { log.Fatalf("\n%s", blib.GetPythonError()		)}
-		case "do", "docker":		if Fd.Success = blib.NewDocker();		!Fd.Success { log.Fatalf("\n%s", blib.GetComposeError()		)}
+		case "ng", "angular":		if success := blib.NewAngular();	!success { log.Fatalf("\n%s", blib.GetAngularError()		)}
+		case "ts", "typescript":	if success := blib.NewTypescript();	!success { log.Fatalf("\n%s", blib.GetTypescriptError()	)}
+		case "go":					if success := blib.NewGo();			!success { log.Fatalf("\n%s", blib.GetGoError()			)}
+		case "py", "python":		if success := blib.NewPython();		!success { log.Fatalf("\n%s", blib.GetPythonError()		)}
+		case "do", "docker":		if success := blib.NewDocker();		!success { log.Fatalf("\n%s", blib.GetComposeError()		)}
 		default:
 			fmt.Printf("%s %s\n\nBuild context: %s was not found... quitting\n\n", blib.LogLose, blib.Red("ALL Bad!"), blib.Red(*Fda.BuildContextPtr))
 			os.Exit(1)
@@ -54,6 +49,11 @@ func applyConfigRules() {
 		fmt.Printf("\n\n")
 		os.Exit(2)
 	}
+	if *Fda.TestPtr && *Fda.TargetAliasPtr == "prod" {
+		fmt.Println(blib.Red("\n\nSorry, can't currently run test harness against production... quitting"))
+		fmt.Printf("\n\n")
+		os.Exit(2)
+	}
 	if (*Fda.DebugPtr || *Fda.VerbosePtr) && *Fda.QuietPtr {
 		fmt.Println(blib.Red("\n\nNeither '-debug' nor '-verbose' can be true when '-quiet' is true... quitting"))
 		fmt.Printf("\n\n")
@@ -61,10 +61,6 @@ func applyConfigRules() {
 	}
 }
 
-
-// Todo:  Add "--init <DOMAIN_NAME>" argument that passes the full complement of configurations/templates
-//  			to an existing non-bingo project (e.g .fd.json, .fd.<DOMAIN_NAME>.json, Dockerfile, docker-compose.yml,
-//  				cloudbuild.json, docker-entrypoint.sh, .env.local.yml
 
 func getCleanConfig(Fdc blib.FDC) blib.FDC{
 	Fda = blib.FDA{
@@ -74,9 +70,10 @@ func getCleanConfig(Fdc blib.FDC) blib.FDC{
 		LocalPtr:				flag.Bool		("local",			Fdc.FdLocal,			"Identifies a build target as local(i.e. not remote)"),
 		QuietPtr:				flag.Bool		("quiet",			Fdc.FdQuiet,			"Turns off all logging to STDOUT "),
 		RemotePtr:				flag.Bool		("remote",		Fdc.FdRemote,			"Identifies a build target as remote(i.e. not local)"),
+		TestPtr:				flag.Bool		("test",			Fdc.FdTest,				"Run test harness"),
 		VerbosePtr:				flag.Bool		("verbose",		Fdc.FdVerbose,			"Verbose execution output"),
 		BuildContextPtr:		flag.String		("context",		Fdc.FdBuildContext,		"REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy"),
-		InitPtr:         		flag.String		("init",			Fdc.FdInit,				"Requires a valid root domain(e.g. example.com) overrides all other args and returns build/deploy artifacts(non-destructive)"),
+		InitPtr:         		flag.String		("init",			Fdc.FdInit,				"Requires a valid root domain(e.g. example.com) Will override other args and delivers build/deploy artifacts(non-destructive)"),
 		NicknamePtr:			flag.String		("nickname",		Fdc.FdNickname,			"Provides the route for mife"),
 		ServiceNamePtr:			flag.String		("service",		Fdc.FdServiceName,		"DEFAULT: $PWD - Working directory and/or Docker Compose service directive."),
 		SiteNicknamePtr:		flag.String		("site",			Fdc.FdSiteNickname,		"Provides the route for mife"),
@@ -97,6 +94,7 @@ func getCleanConfig(Fdc blib.FDC) blib.FDC{
 		FdLocal:            *Fda.LocalPtr,
 		FdQuiet:            *Fda.QuietPtr,
 		FdRemote:           *Fda.RemotePtr,
+		FdTest:         	*Fda.TestPtr,
 		FdVerbose:          *Fda.VerbosePtr,
 		FdBuildContext:     *Fda.BuildContextPtr,
 		FdInit:         	*Fda.InitPtr,

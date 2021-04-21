@@ -38,6 +38,7 @@ func DeploymentHead() {
 		fmt.Printf("  \n    %s %s", pad.Right("Local? ",					25, "."), Green(Fd.FdLocal))
 		fmt.Printf("  \n    %s %s", pad.Right("Quiet? ",					25, "."), Green(Fd.FdQuiet))
 		fmt.Printf("  \n    %s %s", pad.Right("Remote? ",				25, "."), Green(Fd.FdRemote))
+		fmt.Printf("  \n    %s %s", pad.Right("Test? ",					25, "."), Green(Fd.FdTest))
 		fmt.Printf("  \n    %s %s", pad.Right("Verbose? ",				25, "."), Green(Fd.FdVerbose))
 		fmt.Printf("\n\n    %s %s", pad.Right("Nickname ",				25, "."), Green(Fd.FdNickname))
 		fmt.Printf("  \n    %s %s", pad.Right("Service Name ",			25, "."), Green(Fd.FdServiceName))
@@ -129,14 +130,15 @@ func FlexFoot(success bool) {
 	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
 	fmt.Printf(renderColor("\n==  FLEX MIFE DEPLOYMENT END"))
 
+	fmt.Printf("\n\nREMINDER:  Don't forget to update mifedom config(s) with which this mife is intended for use.")
 	logMessage := "*** Success! Visit your handiwork:"
 	if success {
 		if Fd.FdLocal {
-			fmt.Printf("\n%s  %s ***\n\n", logMessage, "http://localhost:"	+ Fd.FdTargetLocalPort	+"/"+ Fd.FdNickname)
+			fmt.Printf("\n%s  %s ***\n\n", logMessage, "http://localhost:"	+ Fd.FdTargetLocalPort	+"/"+ Fd.FdNickname +"/")
 		} else if Fd.FdTargetAlias == "prod" {
-			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://foo.fb."		+ Fd.FdTargetDomain		+"/"+ Fd.FdNickname)
+			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://foo.fb."		+ Fd.FdTargetDomain		+"/"+ Fd.FdNickname +"/")
 		} else {
-			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://too.fb."		+ Fd.FdTargetDomain		+"/"+ Fd.FdNickname)
+			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://too.fb."		+ Fd.FdTargetDomain		+"/"+ Fd.FdNickname +"/")
 		}
 	}
 }
@@ -155,6 +157,7 @@ func ShowGlobalDefaults() {
 	fmt.Printf("\n    | %s %s", pad.Right("Local? ",					25, "."), Blue(Fdg.FdLocal))
 	fmt.Printf("\n    | %s %s", pad.Right("Quiet? ",					25, "."), Blue(Fdg.FdQuiet))
 	fmt.Printf("\n    | %s %s", pad.Right("Remote? ",				25, "."), Blue(Fdg.FdRemote))
+	fmt.Printf("\n    | %s %s", pad.Right("Test? ",					25, "."), Blue(Fdg.FdTest))
 	fmt.Printf("\n    | %s %s", pad.Right("Verbose? ",				25, "."), Blue(Fdg.FdVerbose))
 	fmt.Printf("\n    |%s", pad.Right("",							26, "-"))
 	fmt.Printf("\n    | %s %s", pad.Right("Build Context",			25, "."), Blue(Fdg.FdBuildContext))

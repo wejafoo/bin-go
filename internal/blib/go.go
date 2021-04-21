@@ -31,6 +31,21 @@ func goBuild() bool {
 	args		:= "build -v -o dist/" + Fd.FdNickname
 	argsAbbrev	:= args
 
+	if Fd.FdTest {
+		return goTest(goRun(logPrefix, args, argsAbbrev))
+	} else {
+		return goRun(logPrefix, args, argsAbbrev)
+	}
+
+}
+
+
+func goTest(success bool) bool {
+	if !success { return false }
+	logPrefix	:= Yellow(pad.Right("\ngoTest():", 20, " "))
+	args		:= "test -json ./..."
+	argsAbbrev	:= args
+
 	return goRun(logPrefix, args, argsAbbrev)
 }
 
@@ -61,10 +76,10 @@ func goRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 
 	command	:= exec.Command("go", strings.Split(cmdArgs, " ")...)
 	setEnvironment()
-	command.Env	= os.Environ()
-
-	stderr, _	:= command.StderrPipe()
-	goError		= command.Start()
+	command.Env		 = os.Environ()
+	command.Stdout	 = os.Stderr
+	stderr, _		:= command.StderrPipe()
+	goError			 = command.Start()
 	if goError != nil { log.Printf("%s", Red(goError)) }
 
 	scanner		:= bufio.NewScanner(stderr)

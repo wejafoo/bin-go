@@ -5,10 +5,7 @@ intended to accelerate exploration of your own mifedom.
 Supports a small(but growing) list of popular application
 frameworks/languages.
 
-**NOTE:** If go.mod has changed `go mod vendor` should be rerun.
-
 ----
-
 ## Supported Environments
 
 **Build targets:**
@@ -24,7 +21,6 @@ frameworks/languages.
 - GCP           (Remote only, <span style="color: red"> Local K8s -- Under construction</span>)
 
 ----
-
 ## Developer Install
 
 Clone the git repository and link project root to your path.
@@ -34,12 +30,21 @@ $  `git clone git@github.com:wejafoo/bin-zsh.git`
 $  `cd bin-zsh && ln -s ~/bin  .`
 
 $   `echo 'export PATH=~/bin:${PATH}' >> ~/.zshrc`
-    
+
+$   `go mod tidy`
+
+$   `go build -race -o ~/bin`
+
 ----
+
 ## Description
 
-This utility serves as a simplistic way to build/test/deploy any of the [Supported Environments]() with a single command that uses
-quasi-intelligent defaults based on the following order of precedence:
+This utility serves as a crude build/test/deploy for any of the [Supported Environments](#supported). 
+When configured properly any supported environment should build a mife, bundle the artifacts,
+bundle the artifacts in a deployable image, and finally deploy the app to the  
+specified target with a single command line capable of leveraging any combination of
+command line arguments, smart defaults, local config file, and/or ENV vars using the
+following order of precedence:
 
 1.  manual re-deployment of environment variables -- _( local IDE / remote GCP web UI / local gcloud )_
 1.  runtime environment deployment overrides -- _( docker-compose.yml / GCP cloudbuild.json )_
@@ -65,6 +70,7 @@ each camel-cased word boundary with an underscore and switching to all uppercase
     Bool    local       FdLocal             -- Identifies a build target as local(i.e. not remote)
     Bool    quiet       FdQuiet             -- Turns off all logging to STDOUT 
     Bool    remote      FdRemote            -- Identifies a build target as remote(i.e. not local)
+    Bool    verbose     FdTest              -- Run test harness
     Bool    verbose     FdVerbose           -- Verbose execution output
     String  context     FdBuildContext      -- REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy
     String  init        FdInit              -- 

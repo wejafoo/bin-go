@@ -1,6 +1,7 @@
 {
 	"FdLocal":              false,
-	"FdVerbose":            false,
+    "FdTest":               false,
+    "FdVerbose":            false,
 	"FdBuildContext":       "angular",
 	"FdNickname":           "private-element",
 	"FdSiteNickname":       "WeJa Too",

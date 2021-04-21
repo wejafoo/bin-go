@@ -28,6 +28,7 @@ func NewDocker() bool {
 
 func dockerBuild() bool {
 	if Fd.FdClean { dockerClean() }
+
 	success := composePush(composeBuild())
 
 	return success
@@ -36,6 +37,7 @@ func dockerBuild() bool {
 
 func dockerDeploy() bool {
 	success := true
+
 	if Fd.FdLocal { success = composeUp(composeRemove(composeStop(composePull()))) } else { fmt.Printf("UNDER CONSTRUCTION:  Pure Docker remote deployment ")}
 
 	return success
@@ -56,6 +58,7 @@ func composeBuild() bool {
 
 func composePush(prevSuccess bool) bool {
 	if !prevSuccess{ return false }
+
 	logPrefix	:= Yellow(pad.Right("\ncomposePush():", 20, " "))
 	args		:= "push " + Fd.FdServiceName
 	argsAbbrev	:= args
@@ -75,6 +78,7 @@ func composePull() bool {
 
 func composeUp(prevSuccess bool) bool {
 	if !prevSuccess { return false }
+
 	logPrefix	:= Yellow(pad.Right("\ncomposeUp():", 20, " "))
 	args		:= "--log-level " + Fd.FdTargetLogLevel + " up --detach --force-recreate " + Fd.FdServiceName
 	argsAbbrev	:= "(...) up (...) " + Fd.FdServiceName
@@ -85,6 +89,7 @@ func composeUp(prevSuccess bool) bool {
 
 func composeStop(prevSuccess bool) bool {
 	if !prevSuccess { return false }
+
 	logPrefix	:= Yellow(pad.Right("\ncomposeStop():", 20, " "))
 	args		:= "stop " + Fd.FdServiceName
 	argsAbbrev	:= args
@@ -95,6 +100,7 @@ func composeStop(prevSuccess bool) bool {
 
 func composeRemove(prevSuccess bool) bool {
 	if !prevSuccess { return false }
+
 	logPrefix	:= Yellow(pad.Right("\ncomposeRemove():", 20, " "))
 	args		:= "rm --force " + Fd.FdServiceName
 	argsAbbrev	:= args
@@ -113,9 +119,9 @@ func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 		fmt.Printf("%s$ %s", prefix, logCommand)
 	}
 
-	command			:= exec.Command("docker-compose", strings.Split(cmdArgs, " ")...)
+	command			:=	exec.Command("docker-compose", strings.Split(cmdArgs, " ")...)
 	if success		:=	setEnvironment(); !success { log.Println("Curious issue with setting the environment :'(")}
-	command.Env		= os.Environ()
+	command.Env		=	os.Environ()
 	if Fd.FdDebug {
 		fmt.Printf("\n")
 		log.Println("DEBUG:",				os.Getenv("DEBUG"))
@@ -185,19 +191,17 @@ func dockerRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	}
 
 	command			:= exec.Command("docker", strings.Split(cmdArgs, " ")...)
-
 	stderr, _		:= command.StderrPipe()
-	dockerError	= command.Start()
-	if dockerError != nil { log.Printf("%s", Red(dockerError)) }
-
+	dockerError		= command.Start(); if dockerError != nil { log.Printf("%s", Red(dockerError)) }
 	scanner			:= bufio.NewScanner(stderr)
+
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		stderrText := scanner.Text()
 		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
 	}
 
-	dockerError = command.Wait()
+	dockerError		= command.Wait()
 	if dockerError != nil {
 		log.Printf("%s$ %s%s", prefix, command, WhiteOnRed(" X "))
 		log.Fatalf("\n%s", Red(dockerError))
@@ -207,14 +211,15 @@ func dockerRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 }
 
 
-func GetDockerError() error { return dockerError }
+func GetDockerError()	error { return dockerError	}
 
 
-func GetComposeError() error { return composeError }
+func GetComposeError()	error { return composeError	}
 
 
 func setEnvironment() bool {
 	if err := os.Setenv("DEBUG",				strconv.FormatBool(Fd.FdDebug)	); err != nil { println("derp"); return false }
+	if err := os.Setenv("TEST",				strconv.FormatBool(Fd.FdTest)	); err != nil { println("derp"); return false }
 	if err := os.Setenv("LOGS",				strconv.FormatBool(Fd.FdVerbose)); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_LOCAL_PORT",	Fd.FdTargetLocalPort			); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_REMOTE_PORT",	Fd.FdTargetRemotePort			); err != nil { println("derp"); return false }

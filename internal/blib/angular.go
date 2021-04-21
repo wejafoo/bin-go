@@ -32,8 +32,15 @@ func angularBuild() bool {
 	argsAbbrev	:= args
 
 	return ngNpmRun(logPrefix, args, argsAbbrev)
-	// success		:= ngNpmRun(logPrefix, args, argsAbbrev)
-	// return success
+}
+
+
+func angularTest() bool {
+	logPrefix	:= Yellow(pad.Right("\nangularTest():", 20, " "))
+	args		:= "run test:" + Fd.FdTargetAlias
+	argsAbbrev	:= args
+
+	return ngNpmRun(logPrefix, args, argsAbbrev)
 }
 
 
