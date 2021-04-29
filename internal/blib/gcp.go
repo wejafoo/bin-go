@@ -41,8 +41,9 @@ func gcpDeploy() bool {
 						",_LOGS="				+ strconv.FormatBool(Fd.FdVerbose)	+
 						",_NICKNAME="			+ Fd.FdNickname						+
 						",_SERVICE_NAME="		+ Fd.FdServiceName					+
-						",_SITE_NICKNAME="		+ Fd.FdSiteNickname					+
-						",_TARGET_ALIAS="		+ Fd.FdTargetAlias					+
+						",_SITE_NICKNAME=\""	+ Fd.FdSiteNickname					+
+						"\",_TARGET_ALIAS="		+ Fd.FdTargetAlias					+
+						",_TARGET_LOG_LEVEL="	+ Fd.FdTargetLogLevel				+
 						",_TARGET_REMOTE_PORT="	+ Fd.FdTargetRemotePort				+
 						",_TARGET_IMAGE_TAG="	+ Fd.FdTargetImageTag
 	argsAbbrev	:= "builds submit (...) --config=" + gcpCbFile + " --substitutions=(...)"

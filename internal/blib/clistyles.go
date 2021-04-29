@@ -130,11 +130,17 @@ func FlexFoot(success bool) {
 	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
 	fmt.Printf(renderColor("\n==  FLEX MIFE DEPLOYMENT END"))
 
-	fmt.Printf("\n\nREMINDER:  Don't forget to update mifedom config(s) with which this mife is intended for use.")
+	if Fd.FdRemote  {
+		fmt.Printf(
+			"\n\n%s  %s", Red("REMINDER:"), "This is a remote deployment that may require an update to the mifedom config(s) to enable use.",
+		)
+	}
 	logMessage := "*** Success! Visit your handiwork:"
 	if success {
 		if Fd.FdLocal {
-			fmt.Printf("\n%s  %s ***\n\n", logMessage, "http://localhost:"	+ Fd.FdTargetLocalPort	+"/"+ Fd.FdNickname +"/")
+			fmt.Printf("\n%s  %s%s", logMessage, "http://localhost:", Fd.FdTargetLocalPort)
+			if Fd.FdNickname != "" { fmt.Printf("/%s", Fd.FdNickname) }
+			fmt.Printf("%s ***\n\n", "/")
 		} else if Fd.FdTargetAlias == "prod" {
 			fmt.Printf("\n%s  %s ***\n\n", logMessage, "https://foo.fb."		+ Fd.FdTargetDomain		+"/"+ Fd.FdNickname +"/")
 		} else {

@@ -26,27 +26,27 @@ func NewInstance(file string) FDC {
 	ConfigIsValid	= false
 	Pwd, _			= os.Getwd()
 	Fdg = FDC {
-		FdBuild: true,
-		FdClean: false,
-		FdDebug: false,
-		FdLocal: false,
-		FdQuiet: false,
-		FdRemote: false,
-		FdTest: false,
-		FdVerbose: false,
-		FdBuildContext: "ng",
-		FdInit: "",
-		FdNickname: "public",
-		FdServiceName: "public",
-		FdSiteNickname: "Weja Too",
-		FdTargetAlias: "dev",
-		FdTargetDomain: "example.com",
-		FdTargetImageTag: "latest",
-		FdTargetLocalPort: "9999",
-		FdTargetLogLevel: "info",
-		FdTargetProjectId: "default-project",
-		FdTargetRealm: "default.realm.",
-		FdTargetRemotePort: "8080",
+		FdBuild:			true,
+		FdClean:			false,
+		FdDebug:			false,
+		FdLocal:			false,
+		FdQuiet:			false,
+		FdRemote:			false,
+		FdTest:				false,
+		FdVerbose:			false,
+		FdBuildContext:		"ng",
+		FdInit:				"",
+		FdNickname:			"",
+		FdServiceName:		"public",
+		FdSiteNickname:		"Weja Too",
+		FdTargetAlias:		"dev",
+		FdTargetDomain:		"example.com",
+		FdTargetImageTag:	"latest",
+		FdTargetLocalPort:	"9999",
+		FdTargetLogLevel:	"info",
+		FdTargetProjectId:	"default-project",
+		FdTargetRealm:		"default.realm.",
+		FdTargetRemotePort:	"8080",
 	}
 
 	Fdc = loadInstance(fmt.Sprintf(".fd.%s.json", initInstance(InitFile).InitTargetDomain))
@@ -75,6 +75,8 @@ func NewInstance(file string) FDC {
 
 	e := envconfig.Process("", &Fdc)
 	if e != nil { panic(e) } else { return Fdc }
+
+	return Fdc
 }
 
 

@@ -18,11 +18,13 @@ var (
 
 
 func NewDocker() bool {
-	success := dockerBuild()
 
-	if Fd.FdLocal && success { success = dockerDeploy()}
+	if Fd.FdBuildContext == "docker" {
+		DeploymentHead()
+		PipelineHead()
+	}
 
-	return success
+	return dockerDeploy(dockerBuild())
 }
 
 
@@ -35,10 +37,15 @@ func dockerBuild() bool {
 }
 
 
-func dockerDeploy() bool {
-	success := true
-
-	if Fd.FdLocal { success = composeUp(composeRemove(composeStop(composePull()))) } else { fmt.Printf("UNDER CONSTRUCTION:  Pure Docker remote deployment ")}
+func dockerDeploy(prevSuccess bool) bool {
+	success := false
+	if prevSuccess {
+		if Fd.FdLocal {
+			success = composeUp(composeRemove(composeStop(composePull())))
+		} else {
+			if success = NewGcp();	!success { dockerError = GetGcpError() }
+		}
+	}
 
 	return success
 }
@@ -46,10 +53,11 @@ func dockerDeploy() bool {
 
 func composeBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\ncomposeBuild():", 20, " "))
-	args		:= "build --no-cache --pull "	+
-						"--build-arg NICKNAME " +
-						Fd.FdServiceName				// Add future build args here. BTW, the absent value(as opposed to "--build-arg NICKNAME=foo")
-														// 	forces the build to look to the calling ENV for the value
+	args		:= "build --no-cache --pull "	+		// Add future build args here.
+					"--build-arg NICKNAME "		+		// BTW, an absent value here(as opposed to "--build-arg NICKNAME=foo")
+					"--build-arg SERVICE_NAME " + 		// forces the build to reference the calling ENV for the value
+					"--build-arg TARGET_ALIAS " +
+						Fd.FdServiceName
 	argsAbbrev	:= "build (...) " + Fd.FdServiceName
 
 	return composeRun(logPrefix, args, argsAbbrev)
@@ -132,6 +140,7 @@ func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 		log.Println("TARGET_ALIAS:",		os.Getenv("TARGET_ALIAS"))
 		log.Println("TARGET_IMAGE_TAG:",	os.Getenv("TARGET_IMAGE_TAG"))
 		log.Println("TARGET_LOCAL_PORT:",	os.Getenv("TARGET_LOCAL_PORT"))
+		log.Println("TARGET_LOG_LEVEL:",	os.Getenv("TARGET_LOG_LEVEL"))
 		log.Println("TARGET_PROJECT_ID:",	os.Getenv("TARGET_PROJECT_ID"))
 		log.Println("TARGET_REMOTE_PORT:",	os.Getenv("TARGET_REMOTE_PORT"))
 	}
@@ -211,17 +220,12 @@ func dockerRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 }
 
 
-func GetDockerError()	error { return dockerError	}
-
-
-func GetComposeError()	error { return composeError	}
-
-
 func setEnvironment() bool {
 	if err := os.Setenv("DEBUG",				strconv.FormatBool(Fd.FdDebug)	); err != nil { println("derp"); return false }
 	if err := os.Setenv("TEST",				strconv.FormatBool(Fd.FdTest)	); err != nil { println("derp"); return false }
 	if err := os.Setenv("LOGS",				strconv.FormatBool(Fd.FdVerbose)); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_LOCAL_PORT",	Fd.FdTargetLocalPort			); err != nil { println("derp"); return false }
+	if err := os.Setenv("TARGET_LOG_LEVEL",	Fd.FdTargetLogLevel				); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_REMOTE_PORT",	Fd.FdTargetRemotePort			); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_PROJECT_ID",	Fd.FdTargetProjectId			); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_ALIAS",		Fd.FdTargetAlias				); err != nil { println("derp"); return false }
@@ -232,3 +236,6 @@ func setEnvironment() bool {
 
 	return true
 }
+
+
+func GetComposeError()	error { return composeError	}
