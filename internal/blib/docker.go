@@ -1,3 +1,5 @@
+
+
 package blib
 
 import (
@@ -53,12 +55,21 @@ func dockerDeploy(prevSuccess bool) bool {
 
 func composeBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\ncomposeBuild():", 20, " "))
-	args		:= "build --no-cache --pull "	+		// Add future build args here.
-					"--build-arg NICKNAME "		+		// BTW, an absent value here(as opposed to "--build-arg NICKNAME=foo")
-					"--build-arg SERVICE_NAME " + 		// forces the build to reference the calling ENV for the value
-					"--build-arg TARGET_ALIAS " +
-						Fd.FdServiceName
-	argsAbbrev	:= "build (...) " + Fd.FdServiceName
+	args		:=	"--verbose build --no-cache --pull"	+ " " +		// Add future build args here.
+					"--build-arg SERVICE"				+ " " +		// BTW, an absent value here(as opposed to "--build-arg SERVICE=foo")
+					"--build-arg REPO" 					+ " " + 	// forces the build to reference the calling ENV for the value
+					"--build-arg ROUTE_BASE" 			+ " " +
+					"--build-arg TARGET_ALIAS"			+ " "
+
+	argsAbbrev	:= "build (...)" + " "
+
+	if Fd.FdService == "" {
+		args		+= Fd.FdRepo
+		argsAbbrev	+= Fd.FdRepo
+	} else {
+		args		+= Fd.FdRepo + "-" + Fd.FdService
+		argsAbbrev	+= Fd.FdRepo + "-" + Fd.FdService
+	}
 
 	return composeRun(logPrefix, args, argsAbbrev)
 }
@@ -68,8 +79,14 @@ func composePush(prevSuccess bool) bool {
 	if !prevSuccess{ return false }
 
 	logPrefix	:= Yellow(pad.Right("\ncomposePush():", 20, " "))
-	args		:= "push " + Fd.FdServiceName
+	args		:= "push" + " "
 	argsAbbrev	:= args
+
+	if Fd.FdService == "" {
+		args += Fd.FdRepo
+	} else {
+		args += Fd.FdRepo + "-" + Fd.FdService
+	}
 
 	return composeRun(logPrefix, args, argsAbbrev)
 }
@@ -77,8 +94,14 @@ func composePush(prevSuccess bool) bool {
 
 func composePull() bool {
 	logPrefix	:= Yellow(pad.Right("\ncomposePull():", 20, " "))
-	args		:= "pull " + Fd.FdServiceName
+	args		:= "pull" + " "
 	argsAbbrev	:= args
+
+	if Fd.FdService == "" {
+		args += Fd.FdRepo
+	} else {
+		args += Fd.FdRepo + "-" + Fd.FdService
+	}
 
 	return composeRun(logPrefix, args, argsAbbrev)
 }
@@ -88,8 +111,16 @@ func composeUp(prevSuccess bool) bool {
 	if !prevSuccess { return false }
 
 	logPrefix	:= Yellow(pad.Right("\ncomposeUp():", 20, " "))
-	args		:= "--log-level " + Fd.FdTargetLogLevel + " up --detach --force-recreate " + Fd.FdServiceName
-	argsAbbrev	:= "(...) up (...) " + Fd.FdServiceName
+	args		:= "--log-level " + Fd.FdTargetLogLevel + " up --detach --force-recreate "
+	argsAbbrev	:= "(...) up (...) "
+
+	if Fd.FdService == "" {
+		args		+= Fd.FdRepo
+		argsAbbrev	+= Fd.FdRepo
+	} else {
+		args		+= Fd.FdRepo + "-" + Fd.FdService
+		argsAbbrev	+= Fd.FdRepo + "-" + Fd.FdService
+	}
 
 	return composeRun(logPrefix, args, argsAbbrev)
 }
@@ -99,7 +130,14 @@ func composeStop(prevSuccess bool) bool {
 	if !prevSuccess { return false }
 
 	logPrefix	:= Yellow(pad.Right("\ncomposeStop():", 20, " "))
-	args		:= "stop " + Fd.FdServiceName
+	args		:= "stop" + " "
+
+	if Fd.FdService == "" {
+		args += Fd.FdRepo
+	} else {
+		args += Fd.FdRepo + "-" + Fd.FdService
+	}
+
 	argsAbbrev	:= args
 
 	return composeRun(logPrefix, args, argsAbbrev)
@@ -110,7 +148,14 @@ func composeRemove(prevSuccess bool) bool {
 	if !prevSuccess { return false }
 
 	logPrefix	:= Yellow(pad.Right("\ncomposeRemove():", 20, " "))
-	args		:= "rm --force " + Fd.FdServiceName
+	args		:= "rm --force" + " "
+
+	if Fd.FdService == "" {
+		args		+= Fd.FdRepo
+	} else {
+		args		+= Fd.FdRepo + "-" + Fd.FdService
+	}
+
 	argsAbbrev	:= args
 
 	return composeRun(logPrefix, args, argsAbbrev)
@@ -134,9 +179,10 @@ func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 		fmt.Printf("\n")
 		log.Println("DEBUG:",				os.Getenv("DEBUG"))
 		log.Println("LOGS:",				os.Getenv("LOGS"))
-		log.Println("NICKNAME:",			os.Getenv("NICKNAME"))
-		log.Println("SERVICE_NAME:",		os.Getenv("SERVICE_NAME"))
-		log.Println("SITE_NICKNAME:",		os.Getenv("SITE_NICKNAME"))
+		log.Println("SERVICE:",				os.Getenv("SERVICE"))
+		log.Println("REPO:",				os.Getenv("REPO"))
+		log.Println("ROUTE_BASE:",			os.Getenv("ROUTE_BASE"))
+		log.Println("TITLE:",				os.Getenv("TITLE"))
 		log.Println("TARGET_ALIAS:",		os.Getenv("TARGET_ALIAS"))
 		log.Println("TARGET_IMAGE_TAG:",	os.Getenv("TARGET_IMAGE_TAG"))
 		log.Println("TARGET_LOCAL_PORT:",	os.Getenv("TARGET_LOCAL_PORT"))
@@ -229,10 +275,11 @@ func setEnvironment() bool {
 	if err := os.Setenv("TARGET_REMOTE_PORT",	Fd.FdTargetRemotePort			); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_PROJECT_ID",	Fd.FdTargetProjectId			); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_ALIAS",		Fd.FdTargetAlias				); err != nil { println("derp"); return false }
-	if err := os.Setenv("SERVICE_NAME",		Fd.FdServiceName				); err != nil { println("derp"); return false }
+	if err := os.Setenv("REPO",				Fd.FdRepo				); err != nil { println("derp"); return false }
 	if err := os.Setenv("TARGET_IMAGE_TAG",	Fd.FdTargetImageTag				); err != nil { println("derp"); return false }
-	if err := os.Setenv("NICKNAME",			Fd.FdNickname					); err != nil { println("derp"); return false }
-	if err := os.Setenv("SITE_NICKNAME",		Fd.FdSiteNickname				); err != nil { println("derp"); return false }
+	if err := os.Setenv("SERVICE",			Fd.FdService					); err != nil { println("derp"); return false }
+	if err := os.Setenv("ROUTE_BASE",		Fd.FdRouteBase					); err != nil { println("derp"); return false }
+	if err := os.Setenv("TITLE",		Fd.FdTitle					); err != nil { println("derp"); return false }
 
 	return true
 }

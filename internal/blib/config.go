@@ -1,3 +1,5 @@
+
+
 package blib
 
 import (
@@ -36,9 +38,10 @@ func NewInstance(file string) FDC {
 		FdVerbose:			false,
 		FdBuildContext:		"ng",
 		FdInit:				"",
-		FdNickname:			"",
-		FdServiceName:		"public",
-		FdSiteNickname:		"Weja Too",
+		FdService:			"",
+		FdRouteBase:		"",
+		FdRepo:				"public",
+		FdTitle:			"Weja Too",
 		FdTargetAlias:		"dev",
 		FdTargetDomain:		"example.com",
 		FdTargetImageTag:	"latest",
@@ -61,9 +64,10 @@ func NewInstance(file string) FDC {
 	if !Fdc.FdVerbose					{ Fdc.FdVerbose				= Fdg.FdVerbose				}
 	if Fdc.FdBuildContext		== ""	{ Fdc.FdBuildContext		= Fdg.FdBuildContext		}
 	if Fdc.FdInit				== ""	{ Fdc.FdInit				= Fdg.FdInit				}
-	if Fdc.FdNickname			== ""	{ Fdc.FdNickname			= Fdg.FdNickname			}
-	if Fdc.FdServiceName		== ""	{ Fdc.FdServiceName			= Fdg.FdServiceName			}
-	if Fdc.FdSiteNickname		== ""	{ Fdc.FdSiteNickname		= Fdg.FdSiteNickname		}
+	if Fdc.FdRepo				== ""	{ Fdc.FdRepo				= Fdg.FdRepo				}
+	if Fdc.FdService			== ""	{ Fdc.FdService				= Fdg.FdService				}
+	if Fdc.FdRouteBase			== ""	{ Fdc.FdRouteBase			= Fdg.FdRouteBase			}
+	if Fdc.FdTitle				== ""	{ Fdc.FdTitle				= Fdg.FdTitle				}
 	if Fdc.FdTargetAlias		== ""	{ Fdc.FdTargetAlias			= Fdg.FdTargetAlias			}
 	if Fdc.FdTargetDomain		== ""	{ Fdc.FdTargetDomain		= Fdg.FdTargetDomain		}
 	if Fdc.FdTargetImageTag		== ""	{ Fdc.FdTargetImageTag		= Fdg.FdTargetImageTag		}

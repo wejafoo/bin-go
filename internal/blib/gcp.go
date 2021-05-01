@@ -37,15 +37,16 @@ func gcpDeploy() bool {
 	args		:= "builds submit --no-source --config=" + gcpCbFile				+
 						" --substitutions="											+
 						"_DEBUG="				+ strconv.FormatBool(Fd.FdDebug)	+
-// 						",_TEST="				+ strconv.FormatBool(Fd.FdTest)		+  // not yet implemented for remote deploys
 						",_LOGS="				+ strconv.FormatBool(Fd.FdVerbose)	+
-						",_NICKNAME="			+ Fd.FdNickname						+
-						",_SERVICE_NAME="		+ Fd.FdServiceName					+
-						",_SITE_NICKNAME=\""	+ Fd.FdSiteNickname					+
+						",_SERVICE="			+ Fd.FdService						+
+						",_ROUTE_BASE="			+ Fd.FdRouteBase					+
+						",_REPO="				+ Fd.FdRepo							+
+						",_TITLE=\""			+ Fd.FdTitle						+
 						"\",_TARGET_ALIAS="		+ Fd.FdTargetAlias					+
 						",_TARGET_LOG_LEVEL="	+ Fd.FdTargetLogLevel				+
-						",_TARGET_REMOTE_PORT="	+ Fd.FdTargetRemotePort				+
 						",_TARGET_IMAGE_TAG="	+ Fd.FdTargetImageTag
+	// 					",_TARGET_REMOTE_PORT="	+ Fd.FdTargetRemotePort				+
+	// 					",_TEST="				+ strconv.FormatBool(Fd.FdTest)		+  // future implementation supporting remote push-right testing
 	argsAbbrev	:= "builds submit (...) --config=" + gcpCbFile + " --substitutions=(...)"
 
 	return gcloudRun(logPrefix, args, argsAbbrev)

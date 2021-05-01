@@ -1,4 +1,4 @@
-# BinGo
+#BinGo
 A standardized build and deployment utility built in Go 
 intended to accelerate exploration of your own mifedom.
 
@@ -6,7 +6,7 @@ Supports a small(but growing) list of popular application
 frameworks/languages.
 
 ----
-## Supported Environments
+##Supported Environments
 
 **Build targets:**
 - Angular
@@ -39,7 +39,7 @@ $   `go build -race -o ~/bin`
 
 ## Description
 
-This utility serves as a crude build/test/deploy for any of the [Supported Environments](#supported). 
+This utility serves as a crude build/test/deploy for any of the [Supported Environments](#supported-environments). 
 When configured properly any supported environment should build a mife, bundle the artifacts,
 bundle the artifacts in a deployable image, and finally deploy the app to the  
 specified target with a single command line capable of leveraging any combination of
@@ -74,9 +74,10 @@ each camel-cased word boundary with an underscore and switching to all uppercase
     Bool    verbose     FdVerbose           -- Verbose execution output
     String  context     FdBuildContext      -- REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy
     String  init        FdInit              -- 
-    String  nickname    FdNickname          -- Provides the route for mife
-    String  service     FdServiceName       -- DEFAULT: $PWD - Working directory and/or Docker Compose service directive.
-    String  site        FdSiteNickname      -- Provides the route for mife
+    String  nickname    FdService           -- Provides the route for mife
+    String  route       FdRouteBase         -- Provides the route for mife
+    String  repo        FdRepo              -- DEFAULT: $PWD - Working directory and/or Docker Compose service directive.
+    String  site        FdTitle             -- Provides the pretty name for the service
     String  alias       FdTargetAlias       -- Recognizable label added to viewable instance name
     String  domain      FdTargetDomain      -- The domain within which the target service will be mapped.
     String  image       FdTargetImageTag    -- The default tag of a newly minted build images.
