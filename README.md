@@ -122,6 +122,16 @@ Running the above command with no arguments will prune the following local Docke
 
 ----
 
+## Best Practice
+
+#### FD config file
+
+- FdTargetRealm - should always end with a '.'
+- FdRouteBase - should always begin with a '/' and, if the mife contains sub-routes, end with a '/'
+
+
+----
+
 ## Todos
 
 1. **Todo**: Add documentation here that explains the default config file(s) and how they should be modified

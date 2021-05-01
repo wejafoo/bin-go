@@ -147,7 +147,7 @@ func FlexFoot(success bool) {
 		} else {
 			fmt.Printf("\n%s  %s", logMessage, "https://too.fb."	+ Fd.FdTargetDomain)
 		}
-		if Fd.FdRouteBase != "" { fmt.Printf("/%s", Fd.FdRouteBase) }
+		if Fd.FdRouteBase != "" { fmt.Printf("%s", Fd.FdRouteBase) }
 		fmt.Printf(" ***\n\n")
 	}
 }

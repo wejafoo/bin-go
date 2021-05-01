@@ -239,7 +239,7 @@ func dockerRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
 		logCommand	:= BlackOnGray(" docker " + cmdArgs + " ")
 		fmt.Printf("%s$ %s", prefix, logCommand)
-		fmt.Printf("\n")
+		// fmt.Printf("\n")
 	} else {
 		logCommand	:= "docker " + cmdArgsAbbrev
 		fmt.Printf("%s$ %s", prefix, logCommand)
