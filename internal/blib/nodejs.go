@@ -12,31 +12,31 @@ import (
 	"strings"
 )
 
-var ngNpmError error
+var njsNpmError error
 
-func NewAngular() bool {
+func NewNodejs() bool {
 	if Fd.FdVerbose { fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext)) }
 
 	DeploymentHead()
 	PipelineHead()
 
-	if Fd.FdBuild {angularBuild()}   else   {SkipStep("angularBuild():")}
+	if Fd.FdBuild {nodejsBuild()}   else   {SkipStep("nodejsBuild():")}
 
-	return DeploymentFoot(PipelineFoot(angularDeploy()))
+	return DeploymentFoot(PipelineFoot(nodejsDeploy()))
 }
 
 
-func angularBuild() bool {
-	logPrefix	:= Yellow(pad.Right("\nangularBuild():", 20, " "))
-	args		:= "run build:ngssc:" + Fd.FdTargetAlias
+func nodejsBuild() bool {
+	logPrefix	:= Yellow(pad.Right("\nnodejsBuild():", 20, " "))
+	args		:= "run build:" + Fd.FdTargetAlias
 	argsAbbrev	:= args
 
-	return ngNpmRun(logPrefix, args, argsAbbrev)
+	return njsNpmRun(logPrefix, args, argsAbbrev)
 }
 
 
-func angularTest() bool {
-	logPrefix	:= Yellow(pad.Right("\nangularTest():", 20, " "))
+func nodejsTest() bool {
+	logPrefix	:= Yellow(pad.Right("\nnodejsTest():", 20, " "))
 	args		:= "run test:" + Fd.FdTargetAlias
 	argsAbbrev	:= args
 
@@ -44,15 +44,15 @@ func angularTest() bool {
 }
 
 
-func angularDeploy() bool {
+func nodejsDeploy() bool {
 	success := NewDocker()
-	if !success { ngNpmError = GetComposeError() }
+	if !success { njsNpmError = GetComposeError() }
 
 	return success
 }
 
 
-func ngNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
+func njsNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
 		logCommand	:= BlackOnGray(" npm " + cmdArgs)
 		fmt.Printf("%s$ %s", logPrefix, logCommand)
@@ -60,7 +60,7 @@ func ngNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	} else {
 		logCommand	:= "npm " + cmdArgsAbbrev
 		fmt.Printf("%s$ %s", logPrefix, logCommand)
-		fmt.Printf("\n")
+		// fmt.Printf("\n")
 	}
 
 	command			:= exec.Command("npm", strings.Split(cmdArgs, " ")...)
@@ -68,8 +68,8 @@ func ngNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	command.Env	= os.Environ()
 
 	stderr, _	:= command.StderrPipe()
-	ngNpmError	= command.Start()
-	if ngNpmError != nil { log.Printf("%s", Red(ngNpmError)) }
+	njsNpmError	= command.Start()
+	if njsNpmError != nil { log.Printf("%s", Red(njsNpmError)) }
 
 	scanner		:= bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
@@ -78,14 +78,14 @@ func ngNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText)) }
 	}
 
-	ngNpmError = command.Wait()
-	if ngNpmError != nil {
+	njsNpmError = command.Wait()
+	if njsNpmError != nil {
 		log.Printf("%s$  %s%s", logPrefix, command, WhiteOnRed(" X "))
-		log.Fatalf("%s", Red(ngNpmError))
+		log.Fatalf("\n%s", Red(njsNpmError))
 	}
 
 	return true
 }
 
 
-func GetAngularError() error { return ngNpmError }
+func GetNodejsError() error { return njsNpmError }

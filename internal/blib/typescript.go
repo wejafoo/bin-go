@@ -14,7 +14,6 @@ import (
 
 var tsNpmError error
 
-
 func NewTypescript() bool {
 	if Fd.FdVerbose { fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext)) }
 
@@ -29,19 +28,25 @@ func NewTypescript() bool {
 
 func typescriptBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\ntypescriptBuild():", 20, " "))
-	args		:= "run build:ngssc:" + Fd.FdTargetAlias
+	args		:= "run build:" + Fd.FdTargetAlias
 	argsAbbrev	:= args
 
 	return tsNpmRun(logPrefix, args, argsAbbrev)
 }
 
 
-func typescriptDeploy() bool {
-	success := true
+func typescriptTest() bool {
+	logPrefix	:= Yellow(pad.Right("\ntypescriptTest():", 20, " "))
+	args		:= "run test:" + Fd.FdTargetAlias
+	argsAbbrev	:= args
 
-	if Fd.FdLocal {
-		if success = NewDocker(); !success { tsNpmError = GetComposeError() }
-	}  else if Fd.FdRemote { success = NewGcp() }
+	return ngNpmRun(logPrefix, args, argsAbbrev)
+}
+
+
+func typescriptDeploy() bool {
+	success := NewDocker()
+	if !success { tsNpmError = GetComposeError() }
 
 	return success
 }
@@ -49,21 +54,23 @@ func typescriptDeploy() bool {
 
 func tsNpmRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
-		logCommand	:= BlackOnGray(" tsNpm " + cmdArgs + " ")
+		logCommand	:= BlackOnGray(" npm " + cmdArgs)
 		fmt.Printf("%s$ %s", logPrefix, logCommand)
 		fmt.Printf("\n")
 	} else {
-		logCommand	:= "tsNpm " + cmdArgsAbbrev
+		logCommand	:= "npm " + cmdArgsAbbrev
 		fmt.Printf("%s$ %s", logPrefix, logCommand)
+		// fmt.Printf("\n")
 	}
 
-	command		:= exec.Command("tsNpm", strings.Split(cmdArgs, " ")...)
+	command			:= exec.Command("npm", strings.Split(cmdArgs, " ")...)
 	setEnvironment()
 	command.Env	= os.Environ()
 
 	stderr, _	:= command.StderrPipe()
 	tsNpmError	= command.Start()
 	if tsNpmError != nil { log.Printf("%s", Red(tsNpmError)) }
+
 	scanner		:= bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {

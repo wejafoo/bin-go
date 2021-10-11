@@ -1,9 +1,8 @@
 #BinGo
-A standardized build and deployment utility built in Go 
-intended to accelerate exploration of your own mifedom.
+A standardized minimalistic build/deployment utility built in Go with the intention of accelerating 
+mifedom exploration.
 
-Supports a small(but growing) list of popular application
-frameworks/languages.
+Supports a small(but growing) list of popular languages/frameworks.
 
 ----
 ##Supported Environments
@@ -15,19 +14,19 @@ frameworks/languages.
 - Nodejs(Typescript)
 - Go
 
-**Deploy targets:**
-- Local runner  (langauage-specific, in-memory file watcher with hot reload)
-- Docker        (Local/Remote)
-- GCP           (Remote only, <span style="color: red"> Local K8s -- Under construction</span>)
+**Default deploy targets:**
+- dev       - Target-specific runner (language-specific file watcher with hot reload)
+- local     - Docker (local and/or remote)
+- remote    - GCP    (local and/or remote, <span style="color: red"> Local K8s -- Under construction</span>)
 
 ----
 ## Developer Install
 
 Clone the git repository and link project root to your path.
 
-$  `git clone git@github.com:wejafoo/bin-zsh.git`
+$  `git clone git@github.com:wejafoo/bin-go.git`
 
-$  `cd bin-zsh && ln -s ~/bin  .`
+$  `cd bin-go && ln -s ~/bin  .`
 
 $   `echo 'export PATH=~/bin:${PATH}' >> ~/.zshrc`
 
@@ -39,19 +38,19 @@ $   `go build -race -o ~/bin`
 
 ## Description
 
-This utility serves as a crude build/test/deploy for any of the [Supported Environments](#supported-environments). 
-When configured properly any supported environment should build a mife, bundle the artifacts,
-bundle the artifacts in a deployable image, and finally deploy the app to the  
-specified target with a single command line capable of leveraging any combination of
-command line arguments, smart defaults, local config file, and/or ENV vars using the
-following order of precedence:
+This utility is a minimal build/test/deploy utility aspires to be the lowest common
+denominator of the [Supported Environments](#supported-environments).
 
-1.  manual re-deployment of environment variables -- _( local IDE / remote GCP web UI / local gcloud )_
-1.  runtime environment deployment overrides -- _( docker-compose.yml / GCP cloudbuild.json )_
-1.  command line argument overrides -- (`--TARGET_ALIAS=prod`)
-1.  current environment variable overrides -- (`. ~/.zshrc`/`export TARGET_ALIAS=prod`)
-1.  flex deployment runtime configuration file -- (`<PROJECT ROOT>` / `.fd && <PROJECT ROOT>` / `.fd.<DEPLOYMENT DOMAIN>`)
-1.  intelligent defaults -- _( global hard-coded rules based on language target / Docker image hard-coded defaults )_
+Once configured, builds a mife or mise, bundles its artifacts,
+publishes an image, and deploys a container to the specified target
+in a single command line that respects the environment with the following priority :
+
+1.  **command line arguments**          -- _(`--TARGET_ALIAS=prod`)_
+1.  **local environment**               -- _( local IDE / remote GCP web UI / local gcloud )_
+1.  **remote deployment environment**   -- _( docker-compose.yml / GCP cloudbuild.json )_
+1.  **remote deployment environment**   -- _( docker-compose.yml / GCP cloudbuild.json )_
+1.  **bingo configuration file**        -- _(`<PROJECT ROOT>` / `.fd && <PROJECT ROOT>` / `.fd.<DEPLOYMENT DOMAIN>`)_
+1.  **bingo defaults**                  -- _( global hard-coded rules based on language target / Docker image hard-coded defaults )_
 
 The following itemizes the command line config arguments that can be applied at build time(second column) to the CLI or can 
 be applied via config or ENV variable using the third column.
@@ -92,7 +91,7 @@ each camel-cased word boundary with an underscore and switching to all uppercase
 
 ## Local/Docker
 
-From one of the aforementioned build targets project root, run the following(assumes Docker is installed locally and working):
+From project root, run the following(assumes Docker is installed locally and working):
 
 $   `bingo --local`
 
@@ -101,7 +100,7 @@ $   `bingo --local`
 
 ## Remote/Cloud
 
-From one of the aforementioned build targets project root, run the following(assumes 'gcloud' is installed locally and able to connect to the targeted cloud project):
+From project root, run the following(assumes 'gcloud' is installed locally and able to connect to the targeted cloud project):
 
 $   `bingo -remote=stage`
 
@@ -109,16 +108,19 @@ $   `bingo -remote=stage`
 
 ## Housekeeping
 
-Periodically, run this to ensure local Docker container/image residue is not accumulating.  There are several circumstances that can be responsible for this that these scripts may
-not otherwise be able to address.
+For a variety of reasons, Docker tends to accumulate residue over time and eventually presents
+unwanted side effects, so it might be a good idea to periodically run the following:
 
 $ `bingo -clean`
 
-Running the above command with no arguments will prune the following local Docker artifacts:
-- Stopped containers
-- Unused images
-- Unused networks
-- Unused volumes
+With no additional arguments, this will prune the following local Docker artifacts:
+
+    - Stopped containers
+    - Unused images
+    - Unused networks
+    - Unused volumes
+
+Although it may not clean up your Docker issue, it will likely return Gbs of unnecessarily hoarded disk in just a few seconds.
 
 ----
 
