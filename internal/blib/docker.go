@@ -148,40 +148,33 @@ func composeRemove(prevSuccess bool) bool {
 
 func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
-
-		// UPGRADE TO DOCKER COMPOSE V2 -- Todo: REMOVE THIS MESSAGE ON NEXT COMMIT
-		// logCommand	:= BlackOnGray(" docker-compose " + cmdArgs + " ")
 		logCommand	:= BlackOnGray("docker-compose " + cmdArgs + " ")
-		// logCommand	:= BlackOnGray(" /Applications/Docker.app/Contents/Resources/bin/docker compose " + cmdArgs + " ")
+
 		fmt.Printf("%s$ %s", prefix, logCommand)
 		fmt.Printf("\n")
 	} else {
 		logCommand	:= "docker-compose " + cmdArgsAbbrev
-		// logCommand	:= "/Applications/Docker.app/Contents/Resources/bin/docker compose " + cmdArgsAbbrev
 		fmt.Printf("%s$ %s", prefix, logCommand)
 	}
 
-	// command	:= exec.Command("/bin/sh", "-c", "source", ".env.local.yml;", "docker-compose", strings.Split(cmdArgs, " "...))
 	command		:= exec.Command("docker-compose", strings.Split(cmdArgs, " ")...)
-	// command		:= exec.Command("/Applications/Docker.app/Contents/Resources/bin/docker compose", strings.Split(cmdArgs, " ")...)
 	if success	:= setEnvironment(); !success { log.Println("Curious issue with setting the environment :'(")}
 	command.Env	 = os.Environ()
 	if Fd.FdDebug {
-		if Fd.FdService == "" { log.Printf("UNDEFINED... using REPO") } else { log.Printf("SERVICE: %s", os.Getenv("SERVICE")) }
-		fmt.Printf("\n")
-		log.Println("DEBUG: ", 				os.Getenv("DEBUG"				))
-		log.Println("LOGS: ", 				os.Getenv("LOGS"				))
-		log.Println("IMAGE_URL: ", 			os.Getenv("IMAGE_URL"			))
-		log.Println("CONTAINER: ", 			os.Getenv("CONTAINER"			))
-		log.Println("REPO: ", 				os.Getenv("REPO"				))
-		log.Println("ROUTE_BASE: ", 		os.Getenv("ROUTE_BASE"			))
-		log.Println("TITLE: ", 				os.Getenv("TITLE"				))
-		log.Println("TARGET_ALIAS: ", 		os.Getenv("TARGET_ALIAS"		))
-		log.Println("TARGET_IMAGE_TAG: ", 	os.Getenv("TARGET_IMAGE_TAG"	))
-		log.Println("TARGET_LOCAL_PORT: ", 	os.Getenv("TARGET_LOCAL_PORT"	))
-		log.Println("TARGET_LOG_LEVEL: ", 	os.Getenv("TARGET_LOG_LEVEL"	))
-		log.Println("TARGET_PROJECT_ID: ", 	os.Getenv("TARGET_PROJECT_ID"	))
-		log.Println("TARGET_REMOTE_PORT: ", os.Getenv("TARGET_REMOTE_PORT"	))
+		if Fd.FdService == "" { log.Printf("UNDEFINED... using REPO\n") } else { log.Printf("SERVICE=%s", os.Getenv("SERVICE")) }
+		log.Printf("DEBUG=%s\n",					os.Getenv("DEBUG"				))
+		log.Printf("LOGS=%s\n",					os.Getenv("LOGS"				))
+		log.Printf("IMAGE_URL=%s\n",				os.Getenv("IMAGE_URL"			))
+		log.Printf("CONTAINER=%s\n",				os.Getenv("CONTAINER"			))
+		log.Printf("REPO=%s\n",					os.Getenv("REPO"				))
+		log.Printf("ROUTE_BASE=%s\n",			os.Getenv("ROUTE_BASE"			))
+		log.Printf("TITLE=%s\n",					os.Getenv("TITLE"				))
+		log.Printf("TARGET_ALIAS=%s\n",			os.Getenv("TARGET_ALIAS"		))
+		log.Printf("TARGET_IMAGE_TAG=%s\n",		os.Getenv("TARGET_IMAGE_TAG"	))
+		log.Printf("TARGET_LOCAL_PORT=%s\n",		os.Getenv("TARGET_LOCAL_PORT"	))
+		log.Printf("TARGET_LOG_LEVEL=%s\n",		os.Getenv("TARGET_LOG_LEVEL"	))
+		log.Printf("TARGET_PROJECT_ID=%s\n",		os.Getenv("TARGET_PROJECT_ID"	))
+		log.Printf("TARGET_REMOTE_PORT=%s\n",	os.Getenv("TARGET_REMOTE_PORT"	))
 	}
 
 	stderr, _		:= command.StderrPipe()
@@ -232,7 +225,6 @@ func dockerRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
 		logCommand	:= BlackOnGray(" docker " + cmdArgs + " ")
 		fmt.Printf("%s$ %s", prefix, logCommand)
-		// fmt.Printf("\n")
 	} else {
 		logCommand	:= "docker " + cmdArgsAbbrev
 		fmt.Printf("%s$ %s", prefix, logCommand)
