@@ -28,7 +28,14 @@ func NewGo() bool {
 
 func goBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\ngoBuild():", 20, " "))
-	args		:= "build -v -o dist/" + Fd.FdNickname
+	args		:= "build -v -o dist"
+
+	if Fd.FdRouteBase == "" {
+		if Fd.FdService == "" { args += Fd.FdRepo } else { args += Fd.FdService }
+	} else {
+		args += Fd.FdRouteBase
+	}
+
 	argsAbbrev	:= args
 
 	if Fd.FdTest {
@@ -52,14 +59,7 @@ func goTest(success bool) bool {
 
 func goDeploy() bool {
 	success := true
-
-	if Fd.FdLocal {
-		if success = NewDocker();	!success { goError	= GetComposeError() }
-	}  else if Fd.FdRemote {
-		if success = NewDocker();	!success { ngNpmError = GetComposeError() }
-		if success = NewGcp();		!success { ngNpmError = GetGcpError() }
-	}
-
+	if success = NewDocker(); !success { goError = GetComposeError() }
 	return success
 }
 

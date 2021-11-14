@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="values" type="GoApplicationRunConfiguration" factoryName="Go Application" activateToolWindowBeforeRun="false" singleton="false">
+    <module name="bin-go" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-race" />
+    <kind value="FILE" />
+    <package value="weja.us/values" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="utils/values.go" />
+    <output_directory value="$USER_HOME$/bin" />
+    <option name="run" value="false" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -13,9 +13,10 @@ type FDC struct {																		// fd_origin metadata for future use
 	FdVerbose			bool   `required:"optional" fd_origin:"1"`						// false
 	FdBuildContext		string `required:"optional" fd_origin:"1" split_words:"true"`	// "ng"
 	FdInit	         	string `required:"optional" fd_origin:"1" split_words:"true"`	// "private-element"
-	FdNickname			string `required:"optional" fd_origin:"1" split_words:"true"`	// "private-element"
-	FdServiceName		string `required:"optional" fd_origin:"1" split_words:"true"`	// "micro-private-element",
-	FdSiteNickname		string `required:"optional" fd_origin:"1" split_words:"true"`	// "Weja Too"
+	FdService			string `required:"optional" fd_origin:"1" split_words:"true"`	// "private-element"
+	FdRouteBase			string `required:"optional" fd_origin:"1" split_words:"true"`	// "private-element"
+	FdRepo				string `required:"optional" fd_origin:"1" split_words:"true"`	// "micro-private-element",
+	FdTitle				string `required:"optional" fd_origin:"1" split_words:"true"`	// "Weja Too"
 	FdTargetAlias		string `required:"optional" fd_origin:"1" split_words:"true"`	// "wes"
 	FdTargetDomain		string `required:"optional" fd_origin:"1" split_words:"true"`	// "weja.us"
 	FdTargetImageTag	string `required:"optional" fd_origin:"1" split_words:"true"`	// "latest"
@@ -37,9 +38,10 @@ type FDA struct {
 	VerbosePtr			*bool
 	BuildContextPtr     *string
 	InitPtr        		*string
-	NicknamePtr         *string
-	ServiceNamePtr      *string
-	SiteNicknamePtr     *string
+	ServicePtr 	        *string
+	RouteBasePtr 	    *string
+	RepoPtr      		*string
+	TitlePtr     		*string
 	TargetAliasPtr      *string
 	TargetDomainPtr     *string
 	TargetImageTagPtr   *string

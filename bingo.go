@@ -1,3 +1,5 @@
+
+
 package main
 
 import (
@@ -27,8 +29,9 @@ func main() {
 		blib.InitConfig(Fd.FdInit)
 	} else {
 		switch Fd.FdBuildContext {
-		case "ng", "angular":		if success := blib.NewAngular();	!success { log.Fatalf("\n%s", blib.GetAngularError()		)}
-		case "ts", "typescript":	if success := blib.NewTypescript();	!success { log.Fatalf("\n%s", blib.GetTypescriptError()	)}
+		case "ng",	"angular":		if success := blib.NewAngular();	!success { log.Fatalf("\n%s", blib.GetAngularError()		)}
+		case "ts",	"typescript":	if success := blib.NewTypescript();	!success { log.Fatalf("\n%s", blib.GetTypescriptError()	)}
+		case "njs", "nodejs":		if success := blib.NewNodejs();		!success { log.Fatalf("\n%s", blib.GetNodejsError()		)}
 		case "go":					if success := blib.NewGo();			!success { log.Fatalf("\n%s", blib.GetGoError()			)}
 		case "py", "python":		if success := blib.NewPython();		!success { log.Fatalf("\n%s", blib.GetPythonError()		)}
 		case "do", "docker":		if success := blib.NewDocker();		!success { log.Fatalf("\n%s", blib.GetComposeError()		)}
@@ -64,27 +67,28 @@ func applyConfigRules() {
 
 func getCleanConfig(Fdc blib.FDC) blib.FDC{
 	Fda = blib.FDA{
-		BuildPtr:				flag.Bool		("build",			Fdc.FdBuild,			"DEFAULT: true - Turns on application-specific builds"),
-		CleanPtr:				flag.Bool		("clean",			Fdc.FdClean,			"DEFAULT: false - Locally prunes all stopped containers and any unused image, network, or volume"),
-		DebugPtr:				flag.Bool		("debug",			Fdc.FdDebug,			"Turns on detailed logging and enables a debugger if identified"),
-		LocalPtr:				flag.Bool		("local",			Fdc.FdLocal,			"Identifies a build target as local(i.e. not remote)"),
-		QuietPtr:				flag.Bool		("quiet",			Fdc.FdQuiet,			"Turns off all logging to STDOUT "),
-		RemotePtr:				flag.Bool		("remote",		Fdc.FdRemote,			"Identifies a build target as remote(i.e. not local)"),
-		TestPtr:				flag.Bool		("test",			Fdc.FdTest,				"Run test harness"),
-		VerbosePtr:				flag.Bool		("verbose",		Fdc.FdVerbose,			"Verbose execution output"),
-		BuildContextPtr:		flag.String		("context",		Fdc.FdBuildContext,		"REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy"),
-		InitPtr:         		flag.String		("init",			Fdc.FdInit,				"Requires a valid root domain(e.g. example.com) Will override other args and delivers build/deploy artifacts(non-destructive)"),
-		NicknamePtr:			flag.String		("nickname",		Fdc.FdNickname,			"Provides the route for mife"),
-		ServiceNamePtr:			flag.String		("service",		Fdc.FdServiceName,		"DEFAULT: $PWD - Working directory and/or Docker Compose service directive."),
-		SiteNicknamePtr:		flag.String		("site",			Fdc.FdSiteNickname,		"Provides the route for mife"),
-		TargetAliasPtr:			flag.String		("alias",			Fdc.FdTargetAlias,		"Recognizable label added to viewable instance name"),
-		TargetDomainPtr:		flag.String		("domain",		Fdc.FdTargetDomain,		"The domain within which the target service will be mapped."),
-		TargetImageTagPtr:		flag.String		("image",			Fdc.FdTargetImageTag,	"The default tag of a newly minted build images."),
-		TargetLocalPortPtr:		flag.String		("port",			Fdc.FdTargetLocalPort,	"The host port accessible by a user and mapped to the service port"),
-		TargetLogLevelPtr:		flag.String		("Log",			Fdc.FdTargetLogLevel,	"DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)"),
-		TargetProjectIdPtr:		flag.String		("pid",			Fdc.FdTargetProjectId,	"The project ID used for a cloud-based deployments."),
-		TargetRealmPtr:			flag.String		("realm",			Fdc.FdTargetRealm,		"Prefix that, when prepended to root domain, serves as the app OAuth realm."),
-		TargetRemotePortPtr:	flag.String		("port2",			Fdc.FdTargetRemotePort,	"The actual service port of a running container, rarely available to users."),
+		BuildPtr:			flag.Bool	("build",		Fdc.FdBuild,			"DEFAULT: true - Turns on application-specific builds"),
+		CleanPtr:			flag.Bool	("clean",		Fdc.FdClean,			"DEFAULT: false - Locally prunes all stopped containers and any unused image, network, or volume"),
+		DebugPtr:			flag.Bool	("debug",		Fdc.FdDebug,			"Turns on detailed logging and enables a debugger if identified"),
+		LocalPtr:			flag.Bool	("local",		Fdc.FdLocal,			"Identifies a build target as local(i.e. not remote)"),
+		QuietPtr:			flag.Bool	("quiet",		Fdc.FdQuiet,			"Turns off all logging to STDOUT "),
+		RemotePtr:			flag.Bool	("remote",	Fdc.FdRemote,			"Identifies a build target as remote(i.e. not local)"),
+		TestPtr:			flag.Bool	("test",		Fdc.FdTest,				"Run test harness"),
+		VerbosePtr:			flag.Bool	("verbose",	Fdc.FdVerbose,			"Verbose execution output"),
+		BuildContextPtr:	flag.String	("context",	Fdc.FdBuildContext,		"REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy"),
+		InitPtr:         	flag.String	("init",		Fdc.FdInit,				"Requires a valid root domain(e.g. example.com) Will override other args and delivers build/deploy artifacts(non-destructive)"),
+		RepoPtr:			flag.String	("repo",		Fdc.FdRepo,				"DEFAULT: $PWD - Working directory and/or Docker Compose service directive."),
+		ServicePtr:			flag.String	("service",	Fdc.FdService,			"Appended to the code repo/working directory to identify a specific build/deployment target"),
+		RouteBasePtr:		flag.String	("route",		Fdc.FdRouteBase,		"DEFAULT: $SERVICE - Provides the route for navigating to a specific mife"),
+		TargetAliasPtr:		flag.String	("alias",		Fdc.FdTargetAlias,		"Recognizable label added to viewable instance name"),
+		TargetDomainPtr:	flag.String	("domain",	Fdc.FdTargetDomain,		"The domain within which the target service will be mapped."),
+		TargetImageTagPtr:	flag.String	("image",		Fdc.FdTargetImageTag,	"The default tag of a newly minted build images."),
+		TargetLocalPortPtr:	flag.String	("port",		Fdc.FdTargetLocalPort,	"The host port accessible by a user and mapped to the service port"),
+		TargetLogLevelPtr:	flag.String	("Log",		Fdc.FdTargetLogLevel,	"DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)"),
+		TargetProjectIdPtr:	flag.String	("pid",		Fdc.FdTargetProjectId,	"The project ID used for a cloud-based deployments."),
+		TargetRealmPtr:		flag.String	("realm",		Fdc.FdTargetRealm,		"Prefix that, when prepended to root domain, serves as the app OAuth realm."),
+		TitlePtr:			flag.String	("site",		Fdc.FdTitle,			"Provides the route for mife"),
+		TargetRemotePortPtr: flag.String ("port2",	Fdc.FdTargetRemotePort,	"The actual service port of a running container, rarely available to users."),
 	}
 	flag.Parse()
 	finalConfig := blib.FDC {
@@ -98,9 +102,10 @@ func getCleanConfig(Fdc blib.FDC) blib.FDC{
 		FdVerbose:          *Fda.VerbosePtr,
 		FdBuildContext:     *Fda.BuildContextPtr,
 		FdInit:         	*Fda.InitPtr,
-		FdNickname:         *Fda.NicknamePtr,
-		FdServiceName:      *Fda.ServiceNamePtr,
-		FdSiteNickname:     *Fda.SiteNicknamePtr,
+		FdService:         	*Fda.ServicePtr,
+		FdRouteBase:        *Fda.RouteBasePtr,
+		FdRepo:      		*Fda.RepoPtr,
+		FdTitle:     		*Fda.TitlePtr,
 		FdTargetAlias:      *Fda.TargetAliasPtr,
 		FdTargetDomain:     *Fda.TargetDomainPtr,
 		FdTargetImageTag:   *Fda.TargetImageTagPtr,
@@ -120,7 +125,7 @@ func mockEnv() {
 	// if e := os.Setenv("FD_TARGET_LOCAL_PORT","3000"			); e != nil { fmt.Println("WAAAAAAAAT:", e)}
 	// if e := os.Setenv("FD_TARGET_PROJECT_ID","ENV-weja-us"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
 	// if e := os.Setenv("FD_TARGET_IMAGE_TAG",	"ENV-latest"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
-	// if e := os.Setenv("FD_SERVICE_NAME",		"ENV-public"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
+	// if e := os.Setenv("FD_REPO",				"ENV-public"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
 	// if e := os.Setenv("FD_TARGET",			"REMOTE"		); e != nil { fmt.Println("WAAAAAAAAT:", e)}
 	// if e := os.Setenv("FD_TARGET_DOMAIN",	"ENV-weja-us"	); e != nil { fmt.Println("WAAAAAAAAT:", e)}
 	// if e := os.Setenv("FD_TARGET_ALIAS",		"ENV-wes"		); e != nil { fmt.Println("WAAAAAAAAT:", e)}

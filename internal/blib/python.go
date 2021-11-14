@@ -36,14 +36,7 @@ func pythonBuild() bool {
 
 func pythonDeploy() bool {
 	success := true
-
-	if Fd.FdLocal {
-		if success = NewDocker(); !success {
-			success		= false
-			pythonError	= GetComposeError()
-		}
-	}  else if Fd.FdRemote { success = NewGcp() }
-
+	if success = NewDocker(); !success { pythonError = GetComposeError() }
 	return success
 }
 
