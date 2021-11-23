@@ -53,11 +53,11 @@ func composeBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\ncomposeBuild():", 20, " "))
 	// args		:=	"--verbose build --no-cache --pull"	+ " "  Todo: REMOVE THIS COMMENT ON NEXT COMMIT -- UPGRADE TO DOCKER COMPOSE V2
 	args		:=	"build --no-cache --pull"	+ " "						// Add new build args here
-	args		+=	"--build-arg REPO" 					+ " "
-	args		+=	"--build-arg ROUTE_BASE" 			+ " "
-	args		+=	"--build-arg TARGET_ALIAS"			+ " "
-	args		+=	"--build-arg EXECUTABLE"			+ " "
-	argsAbbrev	:= "build (...)"						+ " "
+	args		+=	"--build-arg REPO" 			+ " "
+	args		+=	"--build-arg ROUTE_BASE" 	+ " "
+	args		+=	"--build-arg TARGET_ALIAS"	+ " "
+	args		+=	"--build-arg EXECUTABLE"	+ " "
+	argsAbbrev	:= "build (...)"				+ " "
 
 	if Fd.FdService == "" {
 		args		+= Fd.FdRepo
@@ -133,13 +133,7 @@ func composeRemove(prevSuccess bool) bool {
 
 	logPrefix	:= Yellow(pad.Right("\ncomposeRemove():", 20, " "))
 	args		:= "rm --force" + " "
-
-	if Fd.FdService == "" {
-		args += Fd.FdRepo
-	} else {
-		args += Fd.FdService
-	}
-
+	if Fd.FdService == "" { args += Fd.FdRepo } else { args += Fd.FdService }
 	argsAbbrev	:= args
 
 	return composeRun(logPrefix, args, argsAbbrev)
@@ -161,7 +155,11 @@ func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if success	:= setEnvironment(); !success { log.Println("Curious issue with setting the environment :'(")}
 	command.Env	 = os.Environ()
 	if Fd.FdDebug {
-		if Fd.FdService == "" { log.Printf("UNDEFINED... using REPO\n") } else { log.Printf("SERVICE=%s", os.Getenv("SERVICE")) }
+		_, set :=os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
+
+		if Fd.FdService == ""	{ log.Printf("UNDEFINED... using REPO\n"	)} else { log.Printf("SERVICE=%s", os.Getenv("SERVICE")	)}
+		if ! set				{ log.Printf("ADC?=%t", false		)} else { log.Printf("ADC?=%t\n", true					)}
+
 		log.Printf("DEBUG=%s\n",					os.Getenv("DEBUG"				))
 		log.Printf("LOGS=%s\n",					os.Getenv("LOGS"				))
 		log.Printf("IMAGE_URL=%s\n",				os.Getenv("IMAGE_URL"			))
@@ -267,14 +265,16 @@ func setEnvironment() bool {
 
 	if Fd.FdService == "" {
 		if Fd.FdBuildContext == "go" { if err := os.Setenv("EXECUTABLE", Fd.FdRepo );	err != nil { println("derp"); return false }}
-		if err := os.Setenv("IMAGE_URL", "us.gcr.io/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag);	err != nil { println("derp"); return false }
+		// if err := os.Setenv("IMAGE_URL", "us.gcr.io/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag);	err != nil { println("derp"); return false }
+		if err := os.Setenv("IMAGE_URL", "us-central1-docker.pkg.dev/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag);	err != nil { println("derp"); return false }
 		if err := os.Setenv("CONTAINER", Fd.FdRepo+"--"+Fd.FdTargetProjectId+"--"+Fd.FdTargetAlias);	err != nil { println("derp"); return false }
 
 	} else {
 		if err := os.Setenv("SERVICE", Fd.FdService);	err != nil { println("derp"); return false }
 		if Fd.FdBuildContext == "go" { if err := os.Setenv("EXECUTABLE", Fd.FdService);	err != nil { println("derp"); return false }}
 		if err := os.Setenv(
-			"IMAGE_URL", "us.gcr.io/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag,
+			// "IMAGE_URL", "us.gcr.io/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag,
+			"IMAGE_URL", "us-central1-docker.pkg.dev/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag,
 		);	err != nil { println("derp"); return false }
 		if err := os.Setenv(
 			"CONTAINER", Fd.FdService+"--"+Fd.FdRepo+"--"+Fd.FdTargetProjectId+"--"+Fd.FdTargetAlias,

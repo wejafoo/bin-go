@@ -43,12 +43,15 @@ func gcpDeploy() bool {
 	args += ",_TARGET_LOG_LEVEL="	+ Fd.FdTargetLogLevel
 	args += ",_IMAGE_URL="
 
+
 	if Fd.FdService == "" {
-		args += "us.gcr.io/"	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
+		// args += "us.gcr.io/"	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
+		args += "us-central1-docker.pkg.dev/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
 		args += ",_CONTAINER="	+ Fd.FdRepo+"--"+Fd.FdTargetProjectId+"--"+Fd.FdTargetAlias
 		if Fd.FdBuildContext == "go" { args += ",_EXECUTABLE="+Fd.FdRepo }
 	} else {
-		args += "us.gcr.io/" 	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
+		// args += "us.gcr.io/" 	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
+		args += "us-central1-docker.pkg.dev/" + Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
 		args += ",_SERVICE=" 	+ Fd.FdService
 		args += ",_CONTAINER="  + Fd.FdService + "--" + Fd.FdRepo + "--" + Fd.FdTargetProjectId + "--" + Fd.FdTargetAlias
 		if Fd.FdBuildContext == "go" { args += ",_EXECUTABLE=" + Fd.FdService }

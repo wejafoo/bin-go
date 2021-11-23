@@ -28,7 +28,7 @@ func NewGo() bool {
 
 func goBuild() bool {
 	logPrefix	:= Yellow(pad.Right("\ngoBuild():", 20, " "))
-	args		:= "build -v -o dist"
+	args		:= "build -v -o .dist"
 
 	if Fd.FdRouteBase == "" {
 		if Fd.FdService == "" { args += Fd.FdRepo } else { args += Fd.FdService }
