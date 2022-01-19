@@ -23,7 +23,7 @@ type FDC struct {																		// fd_origin metadata for future use
 	FdTargetLocalPort	string `required:"optional" fd_origin:"1" split_words:"true"`	// 4021
 	FdTargetLogLevel	string `required:"optional" fd_origin:"1" split_words:"true"`	// "error"
 	FdTargetProjectId	string `required:"optional" fd_origin:"1" split_words:"true"`	// "weja-us"
-	FdTargetRealm		string `required:"optional" fd_origin:"1" split_words:"true"`	// "too.fb."
+	FdTargetRealm		string `required:"optional" fd_origin:"1" split_words:"true"`	// "too."
 	FdTargetRemotePort	string `required:"optional" fd_origin:"1" split_words:"true"`	// 8080
 }
 
