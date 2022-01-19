@@ -35,6 +35,7 @@ func NewInstance(file string) FDC {
 		FdRemote:           false,
 		FdTest:             false,
 		FdVerbose:          false,
+		FdAdc:              "/.secrets/credentials.json",
 		FdBuildContext:     "ng",
 		FdInit:             "",
 		FdService:          "",
@@ -76,6 +77,9 @@ func NewInstance(file string) FDC {
 	}
 	if !Fdc.FdVerbose {
 		Fdc.FdVerbose = Fdg.FdVerbose
+	}
+	if Fdc.FdAdc == "" {
+		Fdc.FdAdc = Fdg.FdAdc
 	}
 	if Fdc.FdBuildContext == "" {
 		Fdc.FdBuildContext = Fdg.FdBuildContext

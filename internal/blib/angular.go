@@ -15,6 +15,7 @@ var ngNpmError error
 
 func NewAngular() bool {
 	if Fd.FdVerbose {
+		fmt.Printf("\n%s", pad.Right("Compiling MIFE DEPLOYMENT configuration ", 113, "."))
 		fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
 	}
 
@@ -38,13 +39,13 @@ func angularBuild() bool {
 	return ngNpmRun(logPrefix, args, argsAbbrev)
 }
 
-func angularTest() bool {
-	logPrefix := Yellow(pad.Right("\nangularTest():", 20, " "))
-	args := "run test:" + Fd.FdTargetAlias
-	argsAbbrev := args
-
-	return ngNpmRun(logPrefix, args, argsAbbrev)
-}
+// func angularTest() bool {
+// 	logPrefix := Yellow(pad.Right("\nangularTest():", 20, " "))
+// 	args := "run test:" + Fd.FdTargetAlias
+// 	argsAbbrev := args
+// 
+// 	return ngNpmRun(logPrefix, args, argsAbbrev)
+// }
 
 func angularDeploy() bool {
 	success := NewDocker()

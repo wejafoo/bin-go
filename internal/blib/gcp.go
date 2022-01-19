@@ -1,20 +1,20 @@
-
-
 package blib
 
 import (
 	"bufio"
 	"fmt"
-	"github.com/willf/pad"
 	"log"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/willf/pad"
 )
 
-var ( gcpError error )
-
+var (
+	gcpError error
+)
 
 func NewGcp() bool {
 	return gcpDeploy()
@@ -29,32 +29,35 @@ func NewGcp() bool {
 	*/
 }
 
-
 func gcpDeploy() bool {
 	logPrefix := Yellow(pad.Right("\ngcloudDeploy():", 20, " "))
 	gcpCbFile := "cloudbuild.json"
 	args := "builds  submit  --no-source  --config=" + gcpCbFile + "  "
 	args += "--substitutions="
-	args += "_DEBUG="				+ strconv.FormatBool(Fd.FdDebug)
-	args += ",_LOGS="				+ strconv.FormatBool(Fd.FdVerbose)
-	args += ",_ROUTE_BASE="			+ Fd.FdRouteBase
-	args += ",_TITLE="				+ Fd.FdTitle
-	args += ",_TARGET_ALIAS="		+ Fd.FdTargetAlias
-	args += ",_TARGET_LOG_LEVEL="	+ Fd.FdTargetLogLevel
+	args += "_DEBUG=" + strconv.FormatBool(Fd.FdDebug)
+	args += ",_LOGS=" + strconv.FormatBool(Fd.FdVerbose)
+	args += ",_GOOGLE_APPLICATION_CREDENTIALS=" + Fd.FdAdc
+	args += ",_ROUTE_BASE=" + Fd.FdRouteBase
+	args += ",_TITLE=" + Fd.FdTitle
+	args += ",_TARGET_ALIAS=" + Fd.FdTargetAlias
+	args += ",_TARGET_LOG_LEVEL=" + Fd.FdTargetLogLevel
 	args += ",_IMAGE_URL="
 
-
 	if Fd.FdService == "" {
-		// args += "us.gcr.io/"	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
-		args += "us-central1-docker.pkg.dev/"+Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
-		args += ",_CONTAINER="	+ Fd.FdRepo+"--"+Fd.FdTargetProjectId+"--"+Fd.FdTargetAlias
-		if Fd.FdBuildContext == "go" { args += ",_EXECUTABLE="+Fd.FdRepo }
+		// args += "us.gcr.io/"	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag		// Google repository
+		args += "us-central1-docker.pkg.dev/" + Fd.FdTargetProjectId + "/" + Fd.FdRepo + "/" + Fd.FdTargetAlias + ":" + Fd.FdTargetImageTag
+		args += ",_CONTAINER=" + Fd.FdRepo + "--" + Fd.FdTargetProjectId + "--" + Fd.FdTargetAlias
+		if Fd.FdBuildContext == "go" {
+			args += ",_EXECUTABLE=" + Fd.FdRepo
+		}
 	} else {
-		// args += "us.gcr.io/" 	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
-		args += "us-central1-docker.pkg.dev/" + Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag
-		args += ",_SERVICE=" 	+ Fd.FdService
-		args += ",_CONTAINER="  + Fd.FdService + "--" + Fd.FdRepo + "--" + Fd.FdTargetProjectId + "--" + Fd.FdTargetAlias
-		if Fd.FdBuildContext == "go" { args += ",_EXECUTABLE=" + Fd.FdService }
+		// args += "us.gcr.io/" 	+ Fd.FdTargetProjectId+"/"+Fd.FdRepo+"/"+Fd.FdService+"/"+Fd.FdTargetAlias+":"+Fd.FdTargetImageTag		// Google repository
+		args += "us-central1-docker.pkg.dev/" + Fd.FdTargetProjectId + "/" + Fd.FdRepo + "/" + Fd.FdService + "/" + Fd.FdTargetAlias + ":" + Fd.FdTargetImageTag
+		args += ",_SERVICE=" + Fd.FdService
+		args += ",_CONTAINER=" + Fd.FdService + "--" + Fd.FdRepo + "--" + Fd.FdTargetProjectId + "--" + Fd.FdTargetAlias
+		if Fd.FdBuildContext == "go" {
+			args += ",_EXECUTABLE=" + Fd.FdService
+		}
 	}
 
 	// args	+= ",_REPO=" + Fd.FdRepo
@@ -62,46 +65,49 @@ func gcpDeploy() bool {
 	// 	",_TARGET_REMOTE_PORT="	+ Fd.FdTargetRemotePort +
 	// 	",_TEST=" + strconv.FormatBool(Fd.FdTest) +  // future implementation supporting remote push-right testing
 
-	argsAbbrev	:= "builds submit (...) --config=" + gcpCbFile + " --substitutions=(...)"
+	argsAbbrev := "builds submit (...) --config=" + gcpCbFile + " --substitutions=(...)"
 
 	return gcloudRun(logPrefix, args, argsAbbrev)
 }
 
-
 func gcloudRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
-	stderrText1	:= ""
-	stderrText2	:= ""
-	stderrText3	:= ""
-	logCommand	:= ""
-	
+	stderrText1 := ""
+	stderrText2 := ""
+	stderrText3 := ""
+	logCommand := ""
+
 	if Fd.FdVerbose {
-		logCommand	= BlackOnGray(" gcloud " + cmdArgs + " ")
+		logCommand = BlackOnGray(" gcloud " + cmdArgs + " ")
 		fmt.Printf("%s$ %s", logPrefix, logCommand)
 		fmt.Printf("\n")
 	} else {
-		logCommand	= "gcloud " + cmdArgsAbbrev
+		logCommand = "gcloud " + cmdArgsAbbrev
 		fmt.Printf("%s$ %s", logPrefix, logCommand)
 	}
-	
-	command		:= exec.Command("gcloud", strings.Split(cmdArgs, "  ")...)
-	command.Env	 = os.Environ()
-	stderr, _	:= command.StderrPipe()
-	gcpError	 = command.Start()
-	if gcpError != nil { log.Printf("%s", Red(gcpError)) }
 
-	scanner			:= bufio.NewScanner(stderr)
+	command := exec.Command("gcloud", strings.Split(cmdArgs, "  ")...)
+	command.Env = os.Environ()
+	stderr, _ := command.StderrPipe()
+	gcpError = command.Start()
+	if gcpError != nil {
+		log.Printf("%s", Red(gcpError))
+	}
+
+	scanner := bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
 		stderrText1 = scanner.Text()
-		if Fd.FdVerbose { log.Printf("%s", Grey(stderrText1)) }
+		if Fd.FdVerbose {
+			log.Printf("%s", Grey(stderrText1))
+		}
 		stderrText3 = stderrText2
 		stderrText2 = stderrText1
 	}
-	
+
 	gcpError = command.Wait()
-	if gcpError != nil  {
+	if gcpError != nil {
 		fmt.Printf("%s$ %s%s\n", logPrefix, logCommand, LogLose)
-		if ! Fd.FdVerbose {
+		if !Fd.FdVerbose {
 			log.Printf("%s", stderrText3)
 			log.Printf("%s", stderrText2)
 			log.Printf("%s", stderrText1)
@@ -111,6 +117,5 @@ func gcloudRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 
 	return true
 }
-
 
 func GetGcpError() error { return gcpError }

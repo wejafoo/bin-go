@@ -24,52 +24,61 @@ var (
 
 func DeploymentHead() {
 	logPrefix := Blue(pad.Right("\n==  Deployment Start", 25, " "))
-	dockerLogInfo := Yellow(pad.Left("<docker>", 56, " "))
-	googleLogInfo := Yellow(pad.Left("<google>", 56, " "))
+	dockerLogInfo := Yellow(pad.Left("<docker>", 95, " "))
+	googleLogInfo := Yellow(pad.Left("<google>", 95, " "))
 	if Fd.FdLocal {
-		fmt.Printf("%s%s", logPrefix, dockerLogInfo)
+		fmt.Printf("%s%s\n", logPrefix, dockerLogInfo)
 	} else {
-		fmt.Printf("%s%s", logPrefix, googleLogInfo)
+		fmt.Printf("%s%s\n", logPrefix, googleLogInfo)
 	}
 	if !Fd.FdQuiet {
-		fmt.Printf("  \n    %s %s", pad.Right("Build? ", 25, "."), Green(Fd.FdBuild))
-		fmt.Printf("  \n    %s %s", pad.Right("Clean? ", 25, "."), Green(Fd.FdClean))
-		fmt.Printf("  \n    %s %s", pad.Right("Debug? ", 25, "."), Green(Fd.FdDebug))
-		fmt.Printf("  \n    %s %s", pad.Right("Local? ", 25, "."), Green(Fd.FdLocal))
-		fmt.Printf("  \n    %s %s", pad.Right("Quiet? ", 25, "."), Green(Fd.FdQuiet))
-		fmt.Printf("  \n    %s %s", pad.Right("Remote? ", 25, "."), Green(Fd.FdRemote))
-		fmt.Printf("  \n    %s %s", pad.Right("Test? ", 25, "."), Green(Fd.FdTest))
-		fmt.Printf("  \n    %s %s", pad.Right("Verbose? ", 25, "."), Green(Fd.FdVerbose))
-		fmt.Printf("\n\n    %s ", pad.Right("Service ", 25, "."))
+		fmt.Printf(" +%s\n", pad.Right("", 118, "-"))
+		fmt.Printf(" | %s %s\n", pad.Right("Build? ", 25, "."), Green(Fd.FdBuild))
+		fmt.Printf(" | %s %s\n", pad.Right("Clean? ", 25, "."), Green(Fd.FdClean))
+		fmt.Printf(" | %s %s\n", pad.Right("Debug? ", 25, "."), Green(Fd.FdDebug))
+		fmt.Printf(" | %s %s\n", pad.Right("Local? ", 25, "."), Green(Fd.FdLocal))
+		fmt.Printf(" | %s %s\n", pad.Right("Quiet? ", 25, "."), Green(Fd.FdQuiet))
+		fmt.Printf(" | %s %s\n", pad.Right("Remote? ", 25, "."), Green(Fd.FdRemote))
+		fmt.Printf(" | %s %s\n", pad.Right("Test? ", 25, "."), Green(Fd.FdTest))
+		fmt.Printf(" | %s %s\n", pad.Right("Verbose? ", 25, "."), Green(Fd.FdVerbose))
+		fmt.Printf(" +%s\n", pad.Right("", 118, "-"))
+		fmt.Printf(" | %s %s\n", pad.Right("ADC ", 25, "."), Green(Fd.FdAdc))
+		fmt.Printf(" | %s ", pad.Right("Service ", 25, "."))
+
 		if Fd.FdService == "" {
-			fmt.Printf("%s", Yellow("N/A"))
+			fmt.Printf("%s\n", Yellow("N/A"))
 		} else {
-			fmt.Printf("%s", Green(Fd.FdService))
+			fmt.Printf("%s\n", Green(Fd.FdService))
 		}
-		fmt.Printf("  \n    %s ", pad.Right("Route Base ", 25, "."))
+
+		fmt.Printf(" | %s ", pad.Right("Route Base ", 25, "."))
+
 		if Fd.FdRouteBase == "" {
-			fmt.Printf("%s", Yellow("N/A"))
+			fmt.Printf("%s\n", Yellow("N/A"))
 		} else {
-			fmt.Printf("%s", Green(Fd.FdRouteBase))
+			fmt.Printf("%s\n", Green(Fd.FdRouteBase))
 		}
-		fmt.Printf("  \n    %s %s", pad.Right("Code Repository ", 25, "."), Green(Fd.FdRepo))
-		fmt.Printf("  \n    %s %s", pad.Right("Service Title ", 25, "."), Green(Fd.FdTitle))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Alias ", 25, "."), Green(Fd.FdTargetAlias))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Domain ", 25, "."), Green(Fd.FdTargetDomain))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Image Tag ", 25, "."), Green(Fd.FdTargetImageTag))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Local Port ", 25, "."), Green(Fd.FdTargetLocalPort))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Log Level ", 25, "."), Green(Fd.FdTargetLogLevel))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Project ID ", 25, "."), Green(Fd.FdTargetProjectId))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Realm ", 25, "."), Green(Fd.FdTargetRealm))
-		fmt.Printf("  \n    %s %s", pad.Right("Target Remote Port ", 25, "."), Green(Fd.FdTargetRemotePort))
+
+		fmt.Printf(" | %s %s\n", pad.Right("Code Repository ", 25, "."), Green(Fd.FdRepo))
+		fmt.Printf(" | %s %s\n", pad.Right("Service Title ", 25, "."), Green(Fd.FdTitle))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Alias ", 25, "."), Green(Fd.FdTargetAlias))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Domain ", 25, "."), Green(Fd.FdTargetDomain))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Image Tag ", 25, "."), Green(Fd.FdTargetImageTag))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Local Port ", 25, "."), Green(Fd.FdTargetLocalPort))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Log Level ", 25, "."), Green(Fd.FdTargetLogLevel))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Project ID ", 25, "."), Green(Fd.FdTargetProjectId))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Realm ", 25, "."), Green(Fd.FdTargetRealm))
+		fmt.Printf(" | %s %s\n", pad.Right("Target Remote Port ", 25, "."), Green(Fd.FdTargetRemotePort))
 		if Fd.FdInit != "" {
-			fmt.Printf("\n\n %s %s", pad.Right("Init ", 25, "."), Green(Fd.FdInit))
+			fmt.Printf("\n%s %s\n", pad.Right("Init ", 25, "."), Green(Fd.FdInit))
 		}
+		fmt.Printf(" +%s", pad.Right("", 118, "-"))
+
 	}
 }
 
 func DeploymentFoot(success bool) bool {
-	logPrefix := pad.Right("==  Deployment End ", 77, ".")
+	logPrefix := pad.Right("==  Deployment End ", 110, ".")
 	logInfo := Blue("")
 	if Fd.FdLocal {
 		logInfo = Blue("docker")
@@ -89,11 +98,11 @@ func DeploymentFoot(success bool) bool {
 
 func PipelineHead() {
 	fmt.Printf(Blue(pad.Right("\n==  Pipeline Start", 25, " ")))
-	fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 56, " ")))
+	fmt.Printf("%s", Yellow(pad.Left("<"+Fdc.FdBuildContext+">", 95, " ")))
 }
 
 func PipelineFoot(success bool) bool {
-	logPrefix := pad.Right("==  Pipeline End ", 77, ".")
+	logPrefix := pad.Right("==  Pipeline End ", 110, ".")
 	logInfo := Blue(Fdc.FdBuildContext)
 	if success {
 		renderColor = Green
@@ -114,22 +123,21 @@ func SkipStep(skippedFunc string) {
 }
 
 func FlexHead() {
-	fmt.Printf("\n%s%s", Blue(pad.Right("==  MIFE FLEX DEPLOYMENT START", 73, " ")), Yellow("<bingo>"))
-	fmt.Printf(Blue(pad.Right("\n", 81, "=")))
+	fmt.Printf("\n%s%s", Blue(pad.Right("==  MIFE FLEX DEPLOYMENT START", 113, " ")), Yellow("<bingo>"))
+	fmt.Printf(Blue(pad.Right("\n", 121, "=")))
 	if Fd.FdVerbose {
 		logInfo := Blue(".fd." + Fd.FdTargetDomain + ".json")
-		fmt.Printf("\n%s", pad.Right("Validating MIFE DEPLOYMENT configuration ", 77, "."))
+		fmt.Printf("\n%s", pad.Right("Validating MIFE DEPLOYMENT configuration ", 97, "."))
 		if ConfigIsValid {
 			fmt.Printf("%s %s", LogWin, logInfo)
 		} else {
 			fmt.Printf("%s %s", LogLose, logInfo)
 		}
-		fmt.Printf("\n%s", pad.Right("Compiling MIFE DEPLOYMENT configuration ", 77, "."))
 	}
 }
 
 func FlexFoot(success bool) {
-	logPrefix := pad.Right("Cleaning up ", 77, ".")
+	logPrefix := pad.Right("Cleaning up ", 110, ".")
 	logInfo := Blue("done")
 
 	if Fd.FdVerbose {
@@ -142,7 +150,7 @@ func FlexFoot(success bool) {
 		renderColor = Red
 	}
 
-	fmt.Printf(renderColor(pad.Right("\n", 81, "=")))
+	fmt.Printf(renderColor(pad.Right("\n", 121, "=")))
 	fmt.Printf(renderColor("\n==  FLEX MIFE DEPLOYMENT END"))
 
 	if Fd.FdRemote {
@@ -167,45 +175,50 @@ func FlexFoot(success bool) {
 }
 
 func ShowGlobalDefaults() {
-	fmt.Printf("\n     %s", pad.Right("", 26, "_"))
-	fmt.Printf("\n    | DIAGNOSTIC INFO:")
-	fmt.Printf("\n    | %s", pad.Right("", 26, "-"))
-	fmt.Printf("\n    | %s %s%s%s", pad.Left("Valid FD init file:", 25, " "), Blue(Pwd), Blue("/"), Blue(InitFile))
-	fmt.Printf("\n    | %s %s%s%s", pad.Left("Valid FD cfg file:", 25, " "), Blue(Pwd), Blue("/"), Blue(fmt.Sprintf(".fd.%s.json", Fdg.FdTargetDomain)))
-	fmt.Printf("\n    | %s", pad.Right("", 26, "-"))
-	fmt.Printf("\n    | %s %s", pad.Right("Build? ", 25, "."), Blue(Fdg.FdBuild))
-	fmt.Printf("\n    | %s %s", pad.Right("Clean? ", 25, "."), Blue(Fdg.FdClean))
-	fmt.Printf("\n    | %s %s", pad.Right("Debug? ", 25, "."), Blue(Fdg.FdDebug))
-	fmt.Printf("\n    | %s %s", pad.Right("Local? ", 25, "."), Blue(Fdg.FdLocal))
-	fmt.Printf("\n    | %s %s", pad.Right("Quiet? ", 25, "."), Blue(Fdg.FdQuiet))
-	fmt.Printf("\n    | %s %s", pad.Right("Remote? ", 25, "."), Blue(Fdg.FdRemote))
-	fmt.Printf("\n    | %s %s", pad.Right("Test? ", 25, "."), Blue(Fdg.FdTest))
-	fmt.Printf("\n    | %s %s", pad.Right("Verbose? ", 25, "."), Blue(Fdg.FdVerbose))
-	fmt.Printf("\n    | %s", pad.Right("", 26, "-"))
-	fmt.Printf("\n    | %s %s", pad.Right("Build Context", 25, "."), Blue(Fdg.FdBuildContext))
-	fmt.Printf("\n    | %s %s", pad.Right("Init", 25, "."), Blue(Fdg.FdInit))
-	fmt.Printf("\n    | %s %s", pad.Right("Repository", 25, "."), Blue(Fdg.FdRepo))
-	fmt.Printf("\n    | %s", pad.Right("Service", 25, "."))
+	fmt.Printf("\n +%s\n", pad.Right("", 118, "-"))
+	fmt.Printf(" | DIAGNOSTIC INFO:\n")
+	fmt.Printf(" +%s\n", pad.Right("", 118, "-"))
+	fmt.Printf(" | %s %s%s%s\n", pad.Left("Valid FD init file:", 19, " "), Blue(Pwd), Blue("/"), Blue(InitFile))
+	fmt.Printf(" | %s %s%s%s\n", pad.Left("Valid FD cfg file:", 19, " "), Blue(Pwd), Blue("/"), Blue(fmt.Sprintf(".fd.%s.json", Fdg.FdTargetDomain)))
+	fmt.Printf(" +%s\n", pad.Right("", 118, "-"))
+	fmt.Printf(" | %s %s\n", pad.Right("Build? ", 25, "."), Blue(Fdg.FdBuild))
+	fmt.Printf(" | %s %s\n", pad.Right("Clean? ", 25, "."), Blue(Fdg.FdClean))
+	fmt.Printf(" | %s %s\n", pad.Right("Debug? ", 25, "."), Blue(Fdg.FdDebug))
+	fmt.Printf(" | %s %s\n", pad.Right("Local? ", 25, "."), Blue(Fdg.FdLocal))
+	fmt.Printf(" | %s %s\n", pad.Right("Quiet? ", 25, "."), Blue(Fdg.FdQuiet))
+	fmt.Printf(" | %s %s\n", pad.Right("Remote? ", 25, "."), Blue(Fdg.FdRemote))
+	fmt.Printf(" | %s %s\n", pad.Right("Test? ", 25, "."), Blue(Fdg.FdTest))
+	fmt.Printf(" | %s %s\n", pad.Right("Verbose? ", 25, "."), Blue(Fdg.FdVerbose))
+	fmt.Printf(" +%s\n", pad.Right("", 118, "-"))
+	fmt.Printf(" | %s %s\n", pad.Right("ADC", 25, "."), Blue(Fdg.FdAdc))
+	fmt.Printf(" | %s %s\n", pad.Right("Build Context", 25, "."), Blue(Fdg.FdBuildContext))
+	fmt.Printf(" | %s %s\n", pad.Right("Init", 25, "."), Blue(Fdg.FdInit))
+	fmt.Printf(" | %s %s\n", pad.Right("Repository", 25, "."), Blue(Fdg.FdRepo))
+	fmt.Printf(" | %s", pad.Right("Service", 25, "."))
+
 	if Fdg.FdService == "" {
-		fmt.Printf("%s", Yellow(" N/A"))
+		fmt.Printf("%s\n", Yellow(" N/A"))
 	} else {
-		fmt.Printf("%s", Blue(Fdg.FdService))
+		fmt.Printf("%s\n", Blue(Fdg.FdService))
 	}
-	fmt.Printf("\n    | %s ", pad.Right("Service Route Base", 25, "."))
+
+	fmt.Printf(" | %s ", pad.Right("Route Base", 25, "."))
+
 	if Fdg.FdService == "" {
-		fmt.Printf("%s", Yellow("N/A"))
+		fmt.Printf("%s\n", Yellow("N/A"))
 	} else {
-		fmt.Printf("%s", Blue(Fdg.FdService))
+		fmt.Printf("%s\n", Blue(Fdg.FdService))
 	}
-	fmt.Printf("\n    | %s %s", pad.Right("Service Title", 25, "."), Blue(Fdg.FdTitle))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Alias", 25, "."), Blue(Fdg.FdTargetAlias))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Domain", 25, "."), Blue(Fdg.FdTargetDomain))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Image Tag", 25, "."), Blue(Fdg.FdTargetImageTag))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Local Port", 25, "."), Blue(Fdg.FdTargetLocalPort))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Log Level", 25, "."), Blue(Fdg.FdTargetLogLevel))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Project ID", 25, "."), Blue(Fdg.FdTargetProjectId))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Remote Port", 25, "."), Blue(Fdg.FdTargetRemotePort))
-	fmt.Printf("\n    | %s %s", pad.Right("Target Realm", 25, "."), Blue(Fdg.FdTargetRealm))
-	fmt.Printf("\n    +%s", pad.Right("", 25, "-"))
+
+	fmt.Printf(" | %s %s\n", pad.Right("Service Title", 25, "."), Blue(Fdg.FdTitle))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Alias", 25, "."), Blue(Fdg.FdTargetAlias))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Domain", 25, "."), Blue(Fdg.FdTargetDomain))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Image Tag", 25, "."), Blue(Fdg.FdTargetImageTag))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Local Port", 25, "."), Blue(Fdg.FdTargetLocalPort))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Log Level", 25, "."), Blue(Fdg.FdTargetLogLevel))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Project ID", 25, "."), Blue(Fdg.FdTargetProjectId))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Remote Port", 25, "."), Blue(Fdg.FdTargetRemotePort))
+	fmt.Printf(" | %s %s\n", pad.Right("Target Realm", 25, "."), Blue(Fdg.FdTargetRealm))
+	fmt.Printf(" +%s", pad.Right("", 118, "-"))
 	fmt.Println()
 }

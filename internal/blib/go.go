@@ -15,18 +15,16 @@ var goError error
 
 func NewGo() bool {
 	if Fd.FdVerbose {
+		fmt.Printf("\n%s", pad.Right("Compiling MIFE DEPLOYMENT configuration ", 113, "."))
 		fmt.Printf("%s %s", LogWin, Blue(Fd.FdBuildContext))
 	}
-
 	DeploymentHead()
 	PipelineHead()
-
 	if Fd.FdBuild {
 		goBuild()
 	} else {
 		SkipStep("goBuild():")
 	}
-
 	return DeploymentFoot(PipelineFoot(goDeploy()))
 }
 
@@ -46,15 +44,12 @@ func goBuild() bool {
 	} else {
 		args += Fd.FdRouteBase
 	}
-
 	argsAbbrev := args
-
 	if Fd.FdTest {
 		return goTest(goRun(logPrefix, args, argsAbbrev))
 	} else {
 		return goRun(logPrefix, args, argsAbbrev)
 	}
-
 }
 
 func goTest(success bool) bool {
@@ -64,7 +59,6 @@ func goTest(success bool) bool {
 	logPrefix := Yellow(pad.Right("\ngoTest():", 20, " "))
 	args := "test -json ./..."
 	argsAbbrev := args
-
 	return goRun(logPrefix, args, argsAbbrev)
 }
 
@@ -95,7 +89,6 @@ func goRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if goError != nil {
 		log.Printf("%s", Red(goError))
 	}
-
 	scanner := bufio.NewScanner(stderr)
 	scanner.Split(bufio.ScanLines)
 	for scanner.Scan() {
@@ -110,7 +103,6 @@ func goRun(logPrefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 		log.Printf("%s$  %s%s", logPrefix, command, WhiteOnRed(" X "))
 		log.Fatalf("%s", Red(goError))
 	}
-
 	return true
 }
 

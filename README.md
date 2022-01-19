@@ -71,7 +71,8 @@ each camel-cased word boundary with an underscore and switching to all uppercase
     Bool    remote      FdRemote            -- Identifies a build target as remote(i.e. not local)
     Bool    verbose     FdTest              -- Run test harness
     Bool    verbose     FdVerbose           -- Verbose execution output
-    String  context     FdBuildContext      -- REQUIRED - Boolean that indicates local(-local) or cloud(-remote) deploy
+    String  adc         FdBuildContext      -- REQUIRED - String indicating the location of default remote credentials
+    String  context     FdBuildContext      -- REQUIRED - String indicating local(-local) or cloud(-remote) deploy
     String  init        FdInit              -- 
     String  nickname    FdService           -- Provides the route for mife
     String  route       FdRouteBase         -- Provides the route for mife

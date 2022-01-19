@@ -54,24 +54,15 @@ func dockerDeploy(prevSuccess bool) bool {
 
 func composeBuild() bool {
 	logPrefix := Yellow(pad.Right("\ncomposeBuild():", 20, " "))
-	// args		:=	"--verbose build --no-cache --pull"	+ " "  Todo: REMOVE THIS COMMENT ON NEXT COMMIT -- UPGRADE TO DOCKER COMPOSE V2
-	// args		:=	"build --no-cache --pull"	+ " "						// Add new build args
-	args := "build --no-cache" + " " // Not sure whether pull is needed
-	args += "--build-arg REPO" + " "
-	args += "--build-arg ROUTE_BASE" + " "
-	args += "--build-arg TARGET_ALIAS" + " "
-	args += "--build-arg EXECUTABLE" + " "
+	args := "build --no-cache" + " " // Not sure whether this pull is that useful	// args:="build --no-cache --pull"+" "
 	argsAbbrev := "build (...)" + " "
-
 	if Fd.FdService == "" {
 		args += Fd.FdRepo
 		argsAbbrev += Fd.FdRepo
 	} else {
-		args += "--build-arg SERVICE" + " "
 		args += Fd.FdService
 		argsAbbrev += Fd.FdService
 	}
-
 	return composeRun(logPrefix, args, argsAbbrev)
 }
 
@@ -153,7 +144,7 @@ func composeRemove(prevSuccess bool) bool {
 
 func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	if Fd.FdVerbose {
-		logCommand := BlackOnGray("docker-compose " + cmdArgs + " ")
+		logCommand := BlackOnGray(" docker-compose " + cmdArgs + " ")
 		fmt.Printf("%s$ %s", prefix, logCommand)
 		fmt.Printf("\n")
 	} else {
@@ -168,35 +159,38 @@ func composeRun(prefix string, cmdArgs string, cmdArgsAbbrev string) bool {
 	command.Env = os.Environ()
 	if Fd.FdDebug {
 		_, set := os.LookupEnv("GOOGLE_APPLICATION_CREDENTIALS")
-		if !set {
-			log.Printf("ADC?=%t", false)
+		if !set { // Google's Application Default Credentials(ADC)
+			log.Printf("  ADC?%s %t\n", pad.Right(" ", 32, "."), Red(false))
+			log.Fatalf(Red("'FdAdc' or 'GOOGLE_APPLICATION_CREDENTIALS' must be set to continue"))
 		} else {
-			log.Printf("ADC?=%t\n", true)
-		} // Google's Application Default Credentials(ADC)
-		if Fd.FdService == "" {
-			log.Printf("UNDEFINED... using REPO\n")
-		} else {
-			log.Printf("SERVICE=%s", os.Getenv("SERVICE"))
+			log.Printf(" ADC?%s %t\n", pad.Right(" ", 32, "."), true)
+			log.Printf(" GOOGLE_APPLICATION_CREDENTIALS %s %s\n", pad.Right(" ", 5, "."), os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 		}
 
-		log.Printf("EXECUTABLE=%s\n", os.Getenv("EXECUTABLE"))
-		log.Printf("DEBUG=%s\n", os.Getenv("DEBUG"))
-		log.Printf("LOGS=%s\n", os.Getenv("LOGS"))
-		log.Printf("IS_DEBUG=%s\n", os.Getenv("IS_DEBUG"))
-		log.Printf("IS_TEST=%s\n", os.Getenv("IS_TEST"))
-		log.Printf("IS_LOCAL=%s\n", os.Getenv("IS_LOCAL"))
-		log.Printf("IS_REMOTE=%s\n", os.Getenv("IS_REMOTE"))
-		log.Printf("IMAGE_URL=%s\n", os.Getenv("IMAGE_URL"))
-		log.Printf("CONTAINER=%s\n", os.Getenv("CONTAINER"))
-		log.Printf("REPO=%s\n", os.Getenv("REPO"))
-		log.Printf("ROUTE_BASE=%s\n", os.Getenv("ROUTE_BASE"))
-		log.Printf("TITLE=%s\n", os.Getenv("TITLE"))
-		log.Printf("TARGET_ALIAS=%s\n", os.Getenv("TARGET_ALIAS"))
-		log.Printf("TARGET_IMAGE_TAG=%s\n", os.Getenv("TARGET_IMAGE_TAG"))
-		log.Printf("TARGET_LOCAL_PORT=%s\n", os.Getenv("TARGET_LOCAL_PORT"))
-		log.Printf("TARGET_LOG_LEVEL=%s\n", os.Getenv("TARGET_LOG_LEVEL"))
-		log.Printf("TARGET_PROJECT_ID=%s\n", os.Getenv("TARGET_PROJECT_ID"))
-		log.Printf("TARGET_REMOTE_PORT=%s\n", os.Getenv("TARGET_REMOTE_PORT"))
+		if Fd.FdService == "" {
+			log.Printf(" SERVICE%s UNDEFINED -- using REPO (see below)\n", pad.Right(" ", 19, "."))
+		} else {
+			log.Printf(" SERVICE%s %s\n", pad.Right(" ", 29, "."), os.Getenv("SERVICE"))
+		}
+
+		log.Printf(" EXECUTABLE%s %s\n", pad.Right(" ", 26, "."), os.Getenv("EXECUTABLE"))
+		log.Printf(" DEBUG%s %s\n", pad.Right(" ", 31, "."), os.Getenv("DEBUG"))
+		log.Printf(" LOGS%s %s\n", pad.Right(" ", 32, "."), os.Getenv("LOGS"))
+		log.Printf(" IS_DEBUG%s %s\n", pad.Right(" ", 28, "."), os.Getenv("IS_DEBUG"))
+		log.Printf(" IS_TEST%s %s\n", pad.Right(" ", 29, "."), os.Getenv("IS_TEST"))
+		log.Printf(" IS_LOCAL%s %s\n", pad.Right(" ", 28, "."), os.Getenv("IS_LOCAL"))
+		log.Printf(" IS_REMOTE%s %s\n", pad.Right(" ", 27, "."), os.Getenv("IS_REMOTE"))
+		log.Printf(" IMAGE_URL%s %s\n", pad.Right(" ", 27, "."), os.Getenv("IMAGE_URL"))
+		log.Printf(" CONTAINER%s %s\n", pad.Right(" ", 27, "."), os.Getenv("CONTAINER"))
+		log.Printf(" REPO%s %s\n", pad.Right(" ", 32, "."), os.Getenv("REPO"))
+		log.Printf(" ROUTE_BASE%s %s\n", pad.Right(" ", 26, "."), os.Getenv("ROUTE_BASE"))
+		log.Printf(" TITLE%s %s\n", pad.Right(" ", 31, "."), os.Getenv("TITLE"))
+		log.Printf(" TARGET_ALIAS%s %s\n", pad.Right(" ", 24, "."), os.Getenv("TARGET_ALIAS"))
+		log.Printf(" TARGET_IMAGE_TAG%s %s\n", pad.Right(" ", 20, "."), os.Getenv("TARGET_IMAGE_TAG"))
+		log.Printf(" TARGET_LOCAL_PORT%s %s\n", pad.Right(" ", 19, "."), os.Getenv("TARGET_LOCAL_PORT"))
+		log.Printf(" TARGET_LOG_LEVEL%s %s\n", pad.Right(" ", 20, "."), os.Getenv("TARGET_LOG_LEVEL"))
+		log.Printf(" TARGET_PROJECT_ID%s %s\n", pad.Right(" ", 19, "."), os.Getenv("TARGET_PROJECT_ID"))
+		log.Printf(" TARGET_REMOTE_PORT%s %s\n", pad.Right(" ", 18, "."), os.Getenv("TARGET_REMOTE_PORT"))
 	}
 
 	stderr, _ := command.StderrPipe()
@@ -310,6 +304,10 @@ func setEnvironment() bool {
 		return false
 	}
 	if err := os.Setenv("IS_VERBOSE", strconv.FormatBool(Fd.FdVerbose)); err != nil {
+		println("derp")
+		return false
+	}
+	if err := os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", Fd.FdAdc); err != nil {
 		println("derp")
 		return false
 	}
